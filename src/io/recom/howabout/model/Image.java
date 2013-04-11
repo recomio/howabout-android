@@ -25,6 +25,14 @@ public class Image {
 		return width;
 	}
 	
+	public String getUrl() {
+		if (pHash.length() > 0) {
+			return "http://images.cdn.realgirls.recom.io/image/" + pHash + "/thumbnail/150/150";
+		} else {
+			throw new RuntimeException("no pHash.");
+		}
+	}
+	
 	@JsonProperty("width")
 	public void setWidth(int width) {
 		this.width = width;

@@ -5,14 +5,13 @@ import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 
-import io.recom.howabout.model.Image;
 import io.recom.howabout.model.ImageList;
+import io.recom.howabout.model.ImageListAdapter;
 import io.recom.howabout.net.RandomImagesRequest;
 import roboguice.fragment.RoboFragment;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,25 +29,29 @@ public class ImageListFragment extends RoboFragment implements OnItemClickListen
 	protected GridView imageList;
 
 	@InjectView(R.id.load)
-	protected ProgressBar bar;
+	protected ProgressBar progressBar;
 
 	private SpiceManager contentManager = new SpiceManager(JacksonSpringAndroidSpiceService.class);
 	private RandomImagesRequest randomImagesRequest = new RandomImagesRequest();
+	
+	private ImageListAdapter imageListAdapter;
 
 	
-	public ImageListFragment() {
-	}
-
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        loadMoreImages();
+        
+        performRequest();
     }
 	
 	@Override
 	public void onStart() {
         contentManager.start(getActivity());
         super.onStart();
+        
+         
+        imageList.setOnItemClickListener(this);
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -63,22 +66,14 @@ public class ImageListFragment extends RoboFragment implements OnItemClickListen
 	}
 
 	@Override
-	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-
+	public void onItemClick(AdapterView<?> arg0, View view, int position, long arg3) {
+		Toast.makeText(getActivity(), Integer.toString(position), Toast.LENGTH_SHORT).show();
 	}
 
 	private void performRequest() {
 		contentManager.execute(randomImagesRequest, new ListImagesRequestListener());
 	}
-
-	public void loadMoreImages() {
-//		 bar.setVisibility(View.VISIBLE);
-
-		performRequest();
-
-//		 bar.setVisibility(View.GONE);
-	}
-
+	
 	private class ListImagesRequestListener implements RequestListener<ImageList> {
 
 		@Override
@@ -86,27 +81,23 @@ public class ImageListFragment extends RoboFragment implements OnItemClickListen
 			Toast.makeText(getActivity(),
 					"Error during request: " + e.getMessage(),
 					Toast.LENGTH_LONG).show();
+			
+			progressBar.setVisibility(View.GONE);
 		}
 
 		@Override
-		public void onRequestSuccess(ImageList images) {
-			// listTweets could be null just if contentManager.getFromCache(...)
-			// doesn't return anything.
-			if (images == null) {
-				Log.i("ListImagesRequestListener", null);
+		public void onRequestSuccess(ImageList imageList) {
+			if (imageList == null) {
 				return;
 			}
 
-			// tweetsAdapter.clear();
-
-			for (Image image : images) {
-				Log.i("image", image.getpHash() + ", " + image.getWidth() + ", " + image.getHeight());
-				// tweetsAdapter.add( tweet.getText() );
-			}
-
-			// tweetsAdapter.notifyDataSetChanged();
+			imageListAdapter = new ImageListAdapter(imageList);
+			ImageListFragment.this.imageList.setAdapter(imageListAdapter);
+			imageListAdapter.notifyDataSetChanged();
 
 			getActivity().setProgressBarIndeterminateVisibility(false);
+			
+			progressBar.setVisibility(View.GONE);
 		}
 
 	}

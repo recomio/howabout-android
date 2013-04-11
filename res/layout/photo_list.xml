@@ -1,14 +1,9 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
+    xmlns:tools="http://schemas.android.com/tools" 
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical"
-    >
-
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Images!!!" />
+    android:id="@+id/RootView">
 	
 	<RelativeLayout
     	    android:layout_width="match_parent"
@@ -34,4 +29,4 @@
         android:stretchMode="columnWidth" >
     </GridView>
     
-</LinearLayout>
+</RelativeLayout>
