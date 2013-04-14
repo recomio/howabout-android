@@ -1,4 +1,4 @@
-package io.recom.howabout.model;
+package io.recom.howabout.category.adult.model;
 
 import java.util.ArrayList;
 

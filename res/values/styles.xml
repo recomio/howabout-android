@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--
         Base application theme, dependent on API level. This theme is replaced
@@ -13,15 +13,31 @@
         -->
     </style>
 
+    
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
-    <style name="LoginFormContainer">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:padding">16dp</item>
+    
+    <style name="HowaboutCustomTheme" parent="@style/Theme.Sherlock.Light">
+        <!-- If you want to use the default ViewPagerIndicator-styles, use the following: -->
+        <!-- <item name="vpiTitlePageIndicatorStyle">@style/Widget.TitlePageIndicator</item> -->
+        <!-- <item name="vpiTabPageIndicatorStyle">@style/Widget.TabPageIndicator</item> -->
+        <item name="vpiTabPageIndicatorStyle">@style/HowaboutVpiTabPageIndicatorStyle</item>
+
+        <!-- If you want to implement your custom style of CirclePageIndicator, do it like so: -->
+        <!-- <item name="vpiCirclePageIndicatorStyle">@style/myCirclePageIndicator</item> -->
+
+        <!-- Put whatever other styles you want to define in your custom theme -->
     </style>
+    
+    <style name="HowaboutVpiTabPageIndicatorStyle" parent="@style/Widget.TabPageIndicator">
+        <item name="android:textColor">#FF444444</item>
+    </style>
+
+    <!-- <style name="myCirclePageIndicator" parent="Widget.CirclePageIndicator">
+        <item name="fillColor">@color/my_custom_circle_indicator_fill_color</item>
+    </style> -->
 
 </resources>

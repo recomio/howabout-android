@@ -1,39 +1,42 @@
 package io.recom.howabout;
 
-
+import io.recom.howabout.category.adult.fragment.AdultCategoryWrapFragment;
+import io.recom.howabout.category.music.fragment.MusicCategoryWrapFragment;
 import roboguice.inject.ContentView;
-import roboguice.inject.InjectResource;
 
 import com.github.rtyley.android.sherlock.roboguice.activity.RoboSherlockFragmentActivity;
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.ActionBar.Tab;
-import com.actionbarsherlock.app.ActionBar.TabListener;
+import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
-
+import android.support.v4.app.Fragment;
+import android.widget.ArrayAdapter;
+import android.widget.SpinnerAdapter;
 
 @ContentView(R.layout.activity_main)
-public class MainActivity extends RoboSherlockFragmentActivity implements TabListener {
-	
-	@InjectResource(R.string.tab_random)
-	String tabRandomString;
+public class MainActivity extends RoboSherlockFragmentActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		ActionBar actionBar = getSupportActionBar();
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-//		actionBar.setDisplayShowTitleEnabled(false);
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+		actionBar.setDisplayShowTitleEnabled(false);
 
-		Tab randomTab = actionBar.newTab().setText(tabRandomString).setTabListener(this);
-		actionBar.addTab(randomTab);
-		
-		Tab imagesTab = actionBar.newTab().setText("Images").setTabListener(this);
-		actionBar.addTab(imagesTab);
+		// dropdown menu in actionBar.
+		final SpinnerAdapter spinnerAdapter = ArrayAdapter.createFromResource(
+				this, R.array.category_list,
+				android.R.layout.simple_list_item_1);
+		actionBar.setListNavigationCallbacks(spinnerAdapter,
+				new HowaboutDropdownNavigationListener());
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
 	}
 
 	@Override
@@ -44,26 +47,43 @@ public class MainActivity extends RoboSherlockFragmentActivity implements TabLis
 	}
 
 	@Override
-	public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-		switch (tab.getPosition()) {
-		case 0:
-			RandomFragment randomFragment = new RandomFragment();
-			getSupportFragmentManager().beginTransaction().replace(R.id.ContentView, randomFragment).commit();
-			break;
-		case 1:
-			ImageListFragment imageListFragment = new ImageListFragment();
-			getSupportFragmentManager().beginTransaction().replace(R.id.ContentView, imageListFragment).commit();
-			break;
+	public void onStart() {
+		super.onStart();
+	}
+
+	@Override
+	public void onStop() {
+		super.onStop();
+	}
+
+	public class HowaboutDropdownNavigationListener implements
+			OnNavigationListener {
+		String[] categoryStrings = getResources().getStringArray(
+				R.array.category_list);
+
+		@Override
+		public boolean onNavigationItemSelected(int position, long itemId) {
+			Fragment categoryWrapFragment;
+
+			if (position == 0) {
+				categoryWrapFragment = new AdultCategoryWrapFragment();
+			} else if (position == 1) {
+				categoryWrapFragment = new MusicCategoryWrapFragment();
+			} else {
+				categoryWrapFragment = new MusicCategoryWrapFragment();
+			}
+
+			Bundle bundle = new Bundle();
+			bundle.putString("category", categoryStrings[position]);
+			categoryWrapFragment.setArguments(bundle);
+
+			getSupportFragmentManager()
+					.beginTransaction()
+					.replace(R.id.contentView, categoryWrapFragment,
+							categoryStrings[position]).commit();
+
+			return true;
 		}
-		
 	}
 
-	@Override
-	public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-	}
-
-	@Override
-	public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-	}
-	
 }

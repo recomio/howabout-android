@@ -6,5 +6,14 @@
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_tab1">Tab1Activity</string>
     <string name="tab_random">Random</string>
+    
+    <string name="category_adult">성인</string>
+    <string name="category_music">음악</string>
+    <string name="category_food">음식</string>
+    <string name="category_humor">유머</string>
+    <string name="category_travel">여행</string>
+    <string name="category_fashion">패션</string>
+    <string name="category_news">뉴스</string>
+    <string name="title_activity_show_image">크게 보기</string>
 
 </resources>

@@ -1,6 +1,6 @@
-package io.recom.howabout.net;
+package io.recom.howabout.category.adult.net;
 
-import io.recom.howabout.model.ImageList;
+import io.recom.howabout.category.adult.model.ImageList;
 
 import android.net.Uri;
 

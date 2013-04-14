@@ -1,17 +1,22 @@
-package io.recom.howabout;
+package io.recom.howabout.category.adult.fragment;
 
 import com.octo.android.robospice.JacksonSpringAndroidSpiceService;
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 
-import io.recom.howabout.model.ImageList;
-import io.recom.howabout.model.ImageListAdapter;
-import io.recom.howabout.net.RandomImagesRequest;
+import io.recom.howabout.R;
+import io.recom.howabout.ShowImageActivity;
+import io.recom.howabout.category.adult.adapter.ImageListAdapter;
+import io.recom.howabout.category.adult.model.Image;
+import io.recom.howabout.category.adult.model.ImageList;
+import io.recom.howabout.category.adult.net.RandomImagesRequest;
 import roboguice.fragment.RoboFragment;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,12 +35,20 @@ public class ImageListFragment extends RoboFragment implements OnItemClickListen
 
 	@InjectView(R.id.load)
 	protected ProgressBar progressBar;
-
-	private SpiceManager contentManager = new SpiceManager(JacksonSpringAndroidSpiceService.class);
-	private RandomImagesRequest randomImagesRequest = new RandomImagesRequest();
 	
-	private ImageListAdapter imageListAdapter;
+	protected String category;
+	protected String tab;
 
+	private RandomImagesRequest randomImagesRequest = new RandomImagesRequest();
+	private ImageListAdapter imageListAdapter;
+	
+	private SpiceManager contentManager = new SpiceManager(JacksonSpringAndroidSpiceService.class);
+
+	
+	public ImageListFragment() {
+		super();
+		Log.i("ImageListFragment", "Constructor()");
+	}
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,29 +58,48 @@ public class ImageListFragment extends RoboFragment implements OnItemClickListen
     }
 	
 	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		
+		imageList.setOnItemClickListener(this);
+        progressBar.setVisibility(View.VISIBLE);
+	}
+	
+	@Override
 	public void onStart() {
-        contentManager.start(getActivity());
         super.onStart();
         
-         
-        imageList.setOnItemClickListener(this);
-        progressBar.setVisibility(View.VISIBLE);
+        contentManager.start(getActivity());
     }
 
     @Override
 	public void onStop() {
-        contentManager.shouldStop();
+    	contentManager.shouldStop();
+    	
         super.onStop();
     }
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		Bundle bundle = getArguments();
+		this.category = bundle.getString("category");
+		this.tab = bundle.getString("tab");
+		
 		return inflater.inflate(R.layout.photo_list, container, false);
 	}
 
 	@Override
 	public void onItemClick(AdapterView<?> arg0, View view, int position, long arg3) {
-		Toast.makeText(getActivity(), Integer.toString(position), Toast.LENGTH_SHORT).show();
+		Image image = (Image) imageListAdapter.getItem(position);
+		
+		Intent intent = new Intent(getActivity(), ShowImageActivity.class);
+		
+		Bundle bundle = new Bundle();
+		bundle.putString("pHash", image.getpHash());
+		bundle.putInt("limit", 7);
+		intent.putExtras(bundle);
+		
+		startActivity(intent);
 	}
 
 	private void performRequest() {
@@ -99,6 +131,6 @@ public class ImageListFragment extends RoboFragment implements OnItemClickListen
 			
 			progressBar.setVisibility(View.GONE);
 		}
-
 	}
+	
 }

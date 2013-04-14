@@ -1,4 +1,4 @@
-package io.recom.howabout.model;
+package io.recom.howabout.category.adult.model;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -9,6 +9,14 @@ public class Image {
     protected String pHash;
     protected int width;
     protected int height;
+    
+    public Image() {
+    	
+    }
+    
+    public Image(String pHash) {
+    	this.pHash = pHash;
+    }
     
 	@JsonProperty("pHash")
     public String getpHash() {
@@ -25,9 +33,17 @@ public class Image {
 		return width;
 	}
 	
-	public String getUrl() {
+	public String getThumbmailUrl() {
 		if (pHash.length() > 0) {
 			return "http://images.cdn.realgirls.recom.io/image/" + pHash + "/thumbnail/150/150";
+		} else {
+			throw new RuntimeException("no pHash.");
+		}
+	}
+	
+	public String getBasicUrl() {
+		if (pHash.length() > 0) {
+			return "http://images.cdn.realgirls.recom.io/image/" + pHash + "/resize/800";
 		} else {
 			throw new RuntimeException("no pHash.");
 		}

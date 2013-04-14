@@ -1,6 +1,7 @@
-package io.recom.howabout.model;
+package io.recom.howabout.category.adult.adapter;
 
 import io.recom.howabout.R;
+import io.recom.howabout.category.adult.model.ImageList;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
@@ -59,11 +60,13 @@ public class ImageListAdapter extends BaseAdapter {
 		final ImageView imageView = (ImageView) imageListItemView.findViewById(R.id.image);
 		final ProgressBar progressBar = (ProgressBar) imageListItemView.findViewById(R.id.load);
 		
-		String imageUrl = imageList.get(position).getUrl();
+		String imageUrl = imageList.get(position).getThumbmailUrl();
 		
 		imageLoader.displayImage(imageUrl, imageView, new ImageLoadingListener() {
 			@Override
 			public void onLoadingStarted(String imageUri, View view) {
+				progressBar.setVisibility(View.VISIBLE);
+				imageView.setVisibility(View.GONE);
 			}
 
 			@Override
@@ -73,8 +76,8 @@ public class ImageListAdapter extends BaseAdapter {
 
 			@Override
 			public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-				progressBar.setVisibility(View.GONE);
 				imageView.setVisibility(View.VISIBLE);
+				progressBar.setVisibility(View.GONE);
 			}
 
 			@Override

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="category_list">
+        <item>@string/category_adult</item>
+        <item>@string/category_music</item>
+        <item>@string/category_food</item>
+        <item>@string/category_humor</item>
+        <item>@string/category_travel</item>
+        <item>@string/category_fashion</item>
+        <item>@string/category_news</item>
+    </string-array>
+</resources>
