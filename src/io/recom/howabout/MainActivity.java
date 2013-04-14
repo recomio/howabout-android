@@ -5,6 +5,8 @@ import io.recom.howabout.category.music.fragment.MusicCategoryWrapFragment;
 import roboguice.inject.ContentView;
 
 import com.github.rtyley.android.sherlock.roboguice.activity.RoboSherlockFragmentActivity;
+import com.octo.android.robospice.JacksonSpringAndroidSpiceService;
+import com.octo.android.robospice.SpiceManager;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.view.Menu;
@@ -17,6 +19,9 @@ import android.widget.SpinnerAdapter;
 
 @ContentView(R.layout.activity_main)
 public class MainActivity extends RoboSherlockFragmentActivity {
+	
+	private SpiceManager contentManager = new SpiceManager(JacksonSpringAndroidSpiceService.class);
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,13 +53,21 @@ public class MainActivity extends RoboSherlockFragmentActivity {
 
 	@Override
 	public void onStart() {
-		super.onStart();
-	}
+        super.onStart();
+        
+        contentManager.start(this);
+    }
 
-	@Override
+    @Override
 	public void onStop() {
-		super.onStop();
-	}
+    	contentManager.shouldStop();
+    	
+        super.onStop();
+    }
+    
+    public SpiceManager getContentManager() {
+    	return contentManager;
+    }
 
 	public class HowaboutDropdownNavigationListener implements
 			OnNavigationListener {

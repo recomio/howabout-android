@@ -1,10 +1,9 @@
 package io.recom.howabout.category.adult.fragment;
 
-import com.octo.android.robospice.JacksonSpringAndroidSpiceService;
-import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 
+import io.recom.howabout.MainActivity;
 import io.recom.howabout.R;
 import io.recom.howabout.ShowImageActivity;
 import io.recom.howabout.category.adult.adapter.ImageListAdapter;
@@ -31,7 +30,7 @@ import android.widget.Toast;
 public class ImageListFragment extends RoboFragment implements OnItemClickListener {
 
 	@InjectView(R.id.photoGrid)
-	protected GridView imageList;
+	protected GridView imagesGridView;
 
 	@InjectView(R.id.load)
 	protected ProgressBar progressBar;
@@ -41,8 +40,6 @@ public class ImageListFragment extends RoboFragment implements OnItemClickListen
 
 	private RandomImagesRequest randomImagesRequest = new RandomImagesRequest();
 	private ImageListAdapter imageListAdapter;
-	
-	private SpiceManager contentManager = new SpiceManager(JacksonSpringAndroidSpiceService.class);
 
 	
 	public ImageListFragment() {
@@ -61,21 +58,17 @@ public class ImageListFragment extends RoboFragment implements OnItemClickListen
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		
-		imageList.setOnItemClickListener(this);
+		imagesGridView.setOnItemClickListener(this);
         progressBar.setVisibility(View.VISIBLE);
 	}
 	
 	@Override
 	public void onStart() {
         super.onStart();
-        
-        contentManager.start(getActivity());
     }
 
     @Override
 	public void onStop() {
-    	contentManager.shouldStop();
-    	
         super.onStop();
     }
 	
@@ -103,10 +96,10 @@ public class ImageListFragment extends RoboFragment implements OnItemClickListen
 	}
 
 	private void performRequest() {
-		contentManager.execute(randomImagesRequest, new ListImagesRequestListener());
+		((MainActivity)getActivity()).getContentManager().execute(randomImagesRequest, new RandomImagesRequestListener());
 	}
 	
-	private class ListImagesRequestListener implements RequestListener<ImageList> {
+	private class RandomImagesRequestListener implements RequestListener<ImageList> {
 
 		@Override
 		public void onRequestFailure(SpiceException e) {
@@ -123,8 +116,8 @@ public class ImageListFragment extends RoboFragment implements OnItemClickListen
 				return;
 			}
 
-			imageListAdapter = new ImageListAdapter(imageList);
-			ImageListFragment.this.imageList.setAdapter(imageListAdapter);
+			imageListAdapter = new ImageListAdapter(getActivity(), imageList);
+			ImageListFragment.this.imagesGridView.setAdapter(imageListAdapter);
 			imageListAdapter.notifyDataSetChanged();
 
 			getActivity().setProgressBarIndeterminateVisibility(false);

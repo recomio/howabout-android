@@ -1,27 +1,39 @@
 package io.recom.howabout.category.adult.adapter;
 
+import io.recom.howabout.MainActivity;
 import io.recom.howabout.R;
 import io.recom.howabout.category.adult.model.ImageList;
+import io.recom.howabout.category.adult.net.RandomImagesRequest;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.ImageLoadingListener;
+import com.octo.android.robospice.persistence.exception.SpiceException;
+import com.octo.android.robospice.request.listener.RequestListener;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 public class ImageListAdapter extends BaseAdapter {
 	
+	private final Activity activity;
 	private final ImageList imageList;
 	private ImageLoader imageLoader;
+	
+	private RandomImagesRequest randomImagesRequest = new RandomImagesRequest();
+	private boolean isLoading = false;
 
 	
-	public ImageListAdapter(ImageList imageList) {
+	public ImageListAdapter(Activity activity, ImageList imageList) {
+		this.activity = activity;
 		this.imageList = imageList;
 		this.imageLoader = ImageLoader.getInstance();
 	}
@@ -86,6 +98,43 @@ public class ImageListAdapter extends BaseAdapter {
 			}
 		});
 		
+		// load more random images if needed.
+		if (position == getCount() - 1 && !isLoading) {
+			Log.i("ImageListAdapter", "need to load more images.");
+			isLoading = true;
+			((MainActivity)activity).getContentManager().execute(randomImagesRequest, new RandomImagesRequestListener());
+		}
+		
 		return imageListItemView;
+	}
+	
+	
+	private class RandomImagesRequestListener implements RequestListener<ImageList> {
+
+		@Override
+		public void onRequestFailure(SpiceException e) {
+			Log.i("ImageListAdapter", "onRequestFailure()");
+			
+			Toast.makeText( activity,
+					"Error during request: " + e.getMessage(),
+					Toast.LENGTH_LONG).show();
+			
+			isLoading = false;
+		}
+
+		@Override
+		public void onRequestSuccess(ImageList imageList) {
+			Log.i("ImageListAdapter", "onRequestSuccess()");
+			
+			if (imageList == null) {
+				isLoading = false;
+				return;
+			}
+			
+			ImageListAdapter.this.imageList.addAll(imageList);
+			ImageListAdapter.this.notifyDataSetChanged();
+			
+			isLoading = false;
+		}
 	}
 }
