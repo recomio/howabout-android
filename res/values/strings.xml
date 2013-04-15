@@ -2,9 +2,12 @@
 <resources>
 
     <string name="app_name">이거어때</string>
+    
+    <string name="menu_search">검색</string>
+    <string name="menu_item_search_action_hint"></string>
+    <string name="menu_item_search_action_menu_text">검색</string>
+    
     <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="title_activity_tab1">Tab1Activity</string>
     <string name="tab_random">Random</string>
     
     <string name="category_adult">성인</string>
@@ -15,5 +18,13 @@
     <string name="category_fashion">패션</string>
     <string name="category_news">뉴스</string>
     <string name="title_activity_show_image">크게 보기</string>
+    
+    <string name="trackTitle">노래제목</string>
+    <string name="artistName">가수</string>
+    <string name="listen">듣기</string>
+    <string name="add">추가</string>
+    
+    <!-- facebook -->
+    <string name="app_id">429667463794371</string>
 
 </resources>

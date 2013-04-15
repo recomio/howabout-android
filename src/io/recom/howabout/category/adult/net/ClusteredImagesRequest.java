@@ -10,7 +10,7 @@ import com.octo.android.robospice.request.springandroid.SpringAndroidSpiceReques
 public class ClusteredImagesRequest extends SpringAndroidSpiceRequest<ImageList> {
 	
 	protected String pHash = "";
-	protected int limit = 7;
+	protected int limit = 0;
 
 	public ClusteredImagesRequest(String pHash, int limit) {
 		this(pHash);
@@ -47,9 +47,11 @@ public class ClusteredImagesRequest extends SpringAndroidSpiceRequest<ImageList>
 		if (pHash.length() == 0) {
 			throw new Exception("no pHash.");
 		}
-		
-        Uri.Builder uriBuilder = Uri.parse( "http://hoogi.me/images/" + pHash + "/cluster" ).buildUpon();
-        uriBuilder.appendQueryParameter( "limit", Integer.toString(this.limit) );
+        
+		Uri.Builder uriBuilder = Uri.parse("http://hoogi.me/images/" + pHash + "/cluster").buildUpon();
+        if (limit > 0) {
+        	uriBuilder.appendQueryParameter( "limit", Integer.toString(this.limit) );
+        }
 
         String url = uriBuilder.build().toString();
 

@@ -9,7 +9,7 @@ import com.octo.android.robospice.request.springandroid.SpringAndroidSpiceReques
 
 public class RandomImagesRequest extends SpringAndroidSpiceRequest<ImageList> {
 	
-	protected int limit = 30;
+	protected int limit = 0;
 
 	public RandomImagesRequest(int limit) {
 		this();
@@ -31,7 +31,9 @@ public class RandomImagesRequest extends SpringAndroidSpiceRequest<ImageList> {
 	@Override
 	public ImageList loadDataFromNetwork() throws Exception {
         Uri.Builder uriBuilder = Uri.parse( "http://hoogi.me/images/random" ).buildUpon();
-        uriBuilder.appendQueryParameter( "limit", Integer.toString(this.limit) );
+        if (limit > 0) {
+        	uriBuilder.appendQueryParameter( "limit", Integer.toString(this.limit) );
+        }
 
         String url = uriBuilder.build().toString();
 

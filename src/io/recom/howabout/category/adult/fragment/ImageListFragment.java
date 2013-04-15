@@ -27,86 +27,90 @@ import android.widget.Toast;
 
 
 @ContentView(R.layout.photo_list)
-public class ImageListFragment extends RoboFragment implements OnItemClickListener {
+public class ImageListFragment extends RoboFragment implements
+		OnItemClickListener {
 
 	@InjectView(R.id.photoGrid)
 	protected GridView imagesGridView;
 
 	@InjectView(R.id.load)
 	protected ProgressBar progressBar;
-	
+
 	protected String category;
 	protected String tab;
 
 	private RandomImagesRequest randomImagesRequest = new RandomImagesRequest();
 	private ImageListAdapter imageListAdapter;
 
-	
 	public ImageListFragment() {
 		super();
-		Log.i("ImageListFragment", "Constructor()");
+		Log.d("ImageListFragment", "Constructor()");
 	}
-	
+
 	@Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        
-        performRequest();
-    }
-	
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+	}
+
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		
+		performRequest();
+
 		imagesGridView.setOnItemClickListener(this);
-        progressBar.setVisibility(View.VISIBLE);
+		progressBar.setVisibility(View.VISIBLE);
 	}
-	
+
 	@Override
 	public void onStart() {
-        super.onStart();
-    }
+		super.onStart();
+	}
 
-    @Override
-	public void onStop() {
-        super.onStop();
-    }
-	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public void onStop() {
+		super.onStop();
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
 		Bundle bundle = getArguments();
 		this.category = bundle.getString("category");
 		this.tab = bundle.getString("tab");
-		
+
 		return inflater.inflate(R.layout.photo_list, container, false);
 	}
 
 	@Override
-	public void onItemClick(AdapterView<?> arg0, View view, int position, long arg3) {
+	public void onItemClick(AdapterView<?> arg0, View view, int position,
+			long arg3) {
 		Image image = (Image) imageListAdapter.getItem(position);
-		
+
 		Intent intent = new Intent(getActivity(), ShowImageActivity.class);
-		
+
 		Bundle bundle = new Bundle();
 		bundle.putString("pHash", image.getpHash());
 		bundle.putInt("limit", 7);
 		intent.putExtras(bundle);
-		
+
 		startActivity(intent);
 	}
 
 	private void performRequest() {
-		((MainActivity)getActivity()).getContentManager().execute(randomImagesRequest, new RandomImagesRequestListener());
+		((MainActivity) getActivity()).getContentManager().execute(
+				randomImagesRequest, new RandomImagesRequestListener());
 	}
-	
-	private class RandomImagesRequestListener implements RequestListener<ImageList> {
+
+	private class RandomImagesRequestListener implements
+			RequestListener<ImageList> {
 
 		@Override
 		public void onRequestFailure(SpiceException e) {
 			Toast.makeText(getActivity(),
 					"Error during request: " + e.getMessage(),
 					Toast.LENGTH_LONG).show();
-			
+
 			progressBar.setVisibility(View.GONE);
 		}
 
@@ -120,10 +124,8 @@ public class ImageListFragment extends RoboFragment implements OnItemClickListen
 			ImageListFragment.this.imagesGridView.setAdapter(imageListAdapter);
 			imageListAdapter.notifyDataSetChanged();
 
-			getActivity().setProgressBarIndeterminateVisibility(false);
-			
 			progressBar.setVisibility(View.GONE);
 		}
 	}
-	
+
 }

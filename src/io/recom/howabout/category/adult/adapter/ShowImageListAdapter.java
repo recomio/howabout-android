@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 public class ShowImageListAdapter extends BaseAdapter {
 
@@ -45,7 +46,7 @@ public class ShowImageListAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+	public View getView(int position, View convertView, final ViewGroup parent) {
 		final View showImageListItemView;
 
 		if (convertView == null) {
@@ -81,18 +82,20 @@ public class ShowImageListAdapter extends BaseAdapter {
 					public void onLoadingComplete(String imageUri, View view,
 							Bitmap loadedImage) {
 
-						// 스크린 width에 꽉 차게 비트맵 리사이징.
-						if (showImageListItemView.getWidth() > 0
-								&& loadedImage.getWidth() > 0) {
-							float ratio = (float) showImageListItemView
-									.getWidth()
-									/ (float) loadedImage.getWidth();
-							imageView.setImageBitmap(Bitmap.createScaledBitmap(
-									loadedImage,
-									showImageListItemView.getWidth(),
-									(int) ((float) loadedImage.getHeight() * ratio),
-									false));
-						}
+						// 스크린 width에 꽉 차게 view 리사이징.
+						float ratio = (float) parent.getWidth()
+								/ (float) loadedImage.getWidth();
+						RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+								parent.getWidth(),
+								(int) ((float) loadedImage.getHeight() * ratio));
+						imageView.setLayoutParams(lp);
+
+						// margin.
+						lp = new RelativeLayout.LayoutParams(
+								RelativeLayout.LayoutParams.MATCH_PARENT,
+								RelativeLayout.LayoutParams.WRAP_CONTENT);
+						lp.setMargins(1, 1, 1, 1);
+						imageView.setLayoutParams(lp);
 
 						imageView.setVisibility(View.VISIBLE);
 						progressBar.setVisibility(View.GONE);
