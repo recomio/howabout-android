@@ -8,6 +8,7 @@ import android.util.Log;
 public class SearchedTracksRequest extends TracksRequest {
 
 	protected String searchKeyword = "";
+	protected int limit = 100;
 
 	public SearchedTracksRequest(String searchKeyword) {
 		super();

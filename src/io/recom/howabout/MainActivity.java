@@ -1,22 +1,12 @@
 package io.recom.howabout;
 
 import io.recom.howabout.category.adult.fragment.AdultCategoryWrapFragment;
+import io.recom.howabout.category.music.activity.SearchedTrackListActivity;
 import io.recom.howabout.category.music.fragment.MusicCategoryWrapFragment;
-import io.recom.howabout.category.music.fragment.SearchedTrackListFragment;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectFragment;
 import roboguice.inject.InjectResource;
-
-import com.github.rtyley.android.sherlock.roboguice.activity.RoboSherlockFragmentActivity;
-import com.octo.android.robospice.JacksonSpringAndroidSpiceService;
-import com.octo.android.robospice.SpiceManager;
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.widget.SearchView;
-
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -24,8 +14,15 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.SpinnerAdapter;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.widget.SearchView;
+
 @ContentView(R.layout.activity_main)
-public class MainActivity extends RoboSherlockFragmentActivity {
+public class MainActivity extends RoboSherlockSpiceFragmentActivity {
 
 	@InjectResource(R.array.category_list)
 	private String[] categoryStrings;
@@ -37,9 +34,6 @@ public class MainActivity extends RoboSherlockFragmentActivity {
 	MusicCategoryWrapFragment musicCategoryWrapFragment;
 
 	private MenuItem searchMenu;
-
-	private SpiceManager contentManager = new SpiceManager(
-			JacksonSpringAndroidSpiceService.class);
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +81,8 @@ public class MainActivity extends RoboSherlockFragmentActivity {
 		searchMenu = menu.getItem(0);
 
 		searchMenu.setActionView(searchView).setShowAsAction(
-				MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+				MenuItem.SHOW_AS_ACTION_ALWAYS
+						| MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
 
 		searchView
 				.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
@@ -105,18 +100,17 @@ public class MainActivity extends RoboSherlockFragmentActivity {
 		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			@Override
 			public boolean onQueryTextSubmit(String searchKeyword) {
-				SearchedTrackListFragment searchedTrackListFragment = new SearchedTrackListFragment();
+				Intent intent = new Intent(MainActivity.this,
+						SearchedTrackListActivity.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
 				Bundle bundle = new Bundle();
 				bundle.putString("category", "music");
 				bundle.putString("method", "search");
 				bundle.putString("searchKeyword", searchKeyword);
-				searchedTrackListFragment.setArguments(bundle);
+				intent.putExtras(bundle);
 
-				getSupportFragmentManager()
-						.beginTransaction()
-						.replace(R.id.contentView, searchedTrackListFragment,
-								"music_search").commit();
+				startActivity(intent);
 
 				return true;
 			}
@@ -133,24 +127,6 @@ public class MainActivity extends RoboSherlockFragmentActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		return super.onOptionsItemSelected(item);
-	}
-
-	@Override
-	public void onStart() {
-		super.onStart();
-
-		contentManager.start(this);
-	}
-
-	@Override
-	public void onStop() {
-		contentManager.shouldStop();
-
-		super.onStop();
-	}
-
-	public SpiceManager getContentManager() {
-		return contentManager;
 	}
 
 	public class HowaboutDropdownNavigationListener implements

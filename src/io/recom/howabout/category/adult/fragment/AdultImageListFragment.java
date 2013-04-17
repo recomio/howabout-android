@@ -5,7 +5,7 @@ import com.octo.android.robospice.request.listener.RequestListener;
 
 import io.recom.howabout.MainActivity;
 import io.recom.howabout.R;
-import io.recom.howabout.ShowImageActivity;
+import io.recom.howabout.category.activity.ShowImageActivity;
 import io.recom.howabout.category.adult.adapter.ImageListAdapter;
 import io.recom.howabout.category.adult.model.Image;
 import io.recom.howabout.category.adult.model.ImageList;
@@ -27,7 +27,7 @@ import android.widget.Toast;
 
 
 @ContentView(R.layout.photo_list)
-public class ImageListFragment extends RoboFragment implements
+public class AdultImageListFragment extends RoboFragment implements
 		OnItemClickListener {
 
 	@InjectView(R.id.photoGrid)
@@ -42,7 +42,7 @@ public class ImageListFragment extends RoboFragment implements
 	private RandomImagesRequest randomImagesRequest = new RandomImagesRequest();
 	private ImageListAdapter imageListAdapter;
 
-	public ImageListFragment() {
+	public AdultImageListFragment() {
 		super();
 		Log.d("ImageListFragment", "Constructor()");
 	}
@@ -121,7 +121,7 @@ public class ImageListFragment extends RoboFragment implements
 			}
 
 			imageListAdapter = new ImageListAdapter(getActivity(), imageList);
-			ImageListFragment.this.imagesGridView.setAdapter(imageListAdapter);
+			AdultImageListFragment.this.imagesGridView.setAdapter(imageListAdapter);
 			imageListAdapter.notifyDataSetChanged();
 
 			progressBar.setVisibility(View.GONE);

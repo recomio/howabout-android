@@ -3,7 +3,7 @@ package io.recom.howabout.category.music.fragment;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 
-import io.recom.howabout.category.music.adapter.TrackListAdapter;
+import io.recom.howabout.category.music.adapter.RandomTrackListAdapter;
 import io.recom.howabout.category.music.model.TrackList;
 import io.recom.howabout.category.music.net.RandomTracksRequest;
 import android.os.Bundle;
@@ -45,7 +45,7 @@ public class RandomTrackListFragment extends TrackListFragment {
 
 			RandomTrackListFragment.this.trackList = trackList;
 
-			trackListAdapter = new TrackListAdapter(getActivity(), trackList);
+			trackListAdapter = new RandomTrackListAdapter(getActivity(), trackList);
 			imagesGridView.setAdapter(trackListAdapter);
 			trackListAdapter.notifyDataSetChanged();
 

@@ -8,6 +8,7 @@ import android.util.Log;
 public class RecommendedTracksRequest extends TracksRequest {
 
 	protected String trackId = "";
+	protected int limit = 100;
 
 	public RecommendedTracksRequest(String trackId) {
 		super();

@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:showAsAction="always|withText"
+        android:title="@string/listen"/>
+    <item
+        android:showAsAction="always|withText"
+        android:title="@string/add"/>
+
+</menu>

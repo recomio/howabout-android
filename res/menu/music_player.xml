@@ -1,0 +1,7 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+    <item android:id="@+id/menu_music_playlist"
+          android:title="@string/title_activity_music_playlist"
+          android:showAsAction="always|withText" />
+
+</menu>

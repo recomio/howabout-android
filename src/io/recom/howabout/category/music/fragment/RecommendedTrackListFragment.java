@@ -3,6 +3,7 @@ package io.recom.howabout.category.music.fragment;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 
+import io.recom.howabout.category.music.activity.TrackListActivity;
 import io.recom.howabout.category.music.adapter.TrackListAdapter;
 import io.recom.howabout.category.music.model.TrackList;
 import io.recom.howabout.category.music.net.RecommendedTracksRequest;
@@ -56,6 +57,12 @@ public class RecommendedTrackListFragment extends TrackListFragment {
 
 			progressBar.setVisibility(View.GONE);
 		}
+	}
+	
+	@Override
+	protected void performRequest(RequestListener<TrackList> requestListener) {
+		((TrackListActivity) getActivity()).getContentManager().execute(
+				tracksRequest, requestListener);
 	}
 
 }

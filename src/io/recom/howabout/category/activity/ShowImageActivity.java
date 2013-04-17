@@ -1,5 +1,6 @@
-package io.recom.howabout;
+package io.recom.howabout.category.activity;
 
+import io.recom.howabout.R;
 import io.recom.howabout.category.adult.adapter.ShowImageListAdapter;
 import io.recom.howabout.category.adult.model.Image;
 import io.recom.howabout.category.adult.model.ImageList;
@@ -74,6 +75,7 @@ public class ShowImageActivity extends RoboSherlockFragmentActivity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		MenuInflater inflater = getSupportMenuInflater();
 		inflater.inflate(R.menu.show_image, menu);
+		
 		return true;
 	}
 

@@ -1,15 +1,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-
-    <!-- <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/action_settings"/> -->
         
     <item android:id="@+id/menu_search"
           android:title="@string/menu_search"
           android:icon="@android:drawable/ic_menu_search"
           android:showAsAction="ifRoom|collapseActionView"
           android:actionViewClass="android.widget.SearchView" />
+    
+    <item
+        android:id="@+id/menu_music_player"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/title_activity_music_player" />
+    
+    <item
+        android:id="@+id/menu_music_playlist"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/title_activity_music_playlist" />
 
 </menu>

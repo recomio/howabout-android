@@ -35,7 +35,7 @@ public class AdultCategoryWrapFragment extends RoboFragment {
 
 		Log.i("AdultCagegoryWrapFragment", "onActivityCreated()");
 
-		Fragment imageListFragment = new ImageListFragment();
+		Fragment imageListFragment = new AdultImageListFragment();
 
 		Bundle bundle = new Bundle();
 		bundle.putString("category", "adult");

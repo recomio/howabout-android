@@ -1,10 +1,27 @@
 package io.recom.howabout.category.music.adapter;
 
-import io.recom.howabout.MainActivity;
+import io.recom.howabout.HowaboutApplication;
 import io.recom.howabout.R;
+import io.recom.howabout.RoboSherlockSpiceFragmentActivity;
+import io.recom.howabout.category.music.activity.MusicPlayerActivity;
+import io.recom.howabout.category.music.model.PlayInfo;
 import io.recom.howabout.category.music.model.Track;
 import io.recom.howabout.category.music.model.TrackList;
-import io.recom.howabout.category.music.net.RandomTracksRequest;
+import io.recom.howabout.category.music.net.PlayInfoRequest;
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
@@ -12,31 +29,12 @@ import com.nostra13.universalimageloader.core.assist.ImageLoadingListener;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 
-import android.app.Activity;
-import android.graphics.Bitmap;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
-
 public class TrackListAdapter extends BaseAdapter {
-	
-	private final Activity activity;
-	private final TrackList trackList;
-	private ImageLoader imageLoader;
-	
-	private RandomTracksRequest tracksRequest = new RandomTracksRequest();
-	private boolean isLoading = false;
 
-	
+	protected final Activity activity;
+	protected final TrackList trackList;
+	protected ImageLoader imageLoader;
+
 	public TrackListAdapter(Activity activity, TrackList trackList) {
 		this.activity = activity;
 		this.trackList = trackList;
@@ -65,92 +63,121 @@ public class TrackListAdapter extends BaseAdapter {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		final View trackListItemView;
-		
+
 		if (convertView == null) {
 			LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-			trackListItemView = inflater.inflate(R.layout.track_list_item, parent, false);
+			trackListItemView = inflater.inflate(R.layout.track_list_item,
+					parent, false);
 		} else {
 			trackListItemView = convertView;
 		}
-		
-		
-		final RelativeLayout rootView = (RelativeLayout) trackListItemView.findViewById(R.id.RootView);
-		final ProgressBar progressBar = (ProgressBar) trackListItemView.findViewById(R.id.load);
-		final LinearLayout itemLayout = (LinearLayout) trackListItemView.findViewById(R.id.itemLayout);
-		final ImageView imageView = (ImageView) trackListItemView.findViewById(R.id.image);
-		final TextView trackTitle = (TextView) trackListItemView.findViewById(R.id.trackTitle);
-		final TextView artistName = (TextView) trackListItemView.findViewById(R.id.artistName);
-		
-		Track track = trackList.get(position);
+
+		final ProgressBar progressBar = (ProgressBar) trackListItemView
+				.findViewById(R.id.load);
+		final ImageView imageView = (ImageView) trackListItemView
+				.findViewById(R.id.image);
+		final TextView trackTitle = (TextView) trackListItemView
+				.findViewById(R.id.trackTitle);
+		final TextView artistName = (TextView) trackListItemView
+				.findViewById(R.id.artistName);
+
+		final Track track = trackList.get(position);
 		trackTitle.setText(track.getTrackTitle());
 		artistName.setText(track.getArtistName());
-		
+
 		String imageUrl = track.getThumbmailUrl();
-		
-		imageLoader.displayImage(imageUrl, imageView, new ImageLoadingListener() {
-			@Override
-			public void onLoadingStarted(String imageUri, View view) {
-				progressBar.setVisibility(View.VISIBLE);
-				itemLayout.setVisibility(View.GONE);
-			}
 
-			@Override
-			public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-				progressBar.setVisibility(View.GONE);
-			}
+		imageLoader.displayImage(imageUrl, imageView,
+				new ImageLoadingListener() {
+					@Override
+					public void onLoadingStarted(String imageUri, View view) {
+						progressBar.setVisibility(View.VISIBLE);
+						imageView.setVisibility(View.INVISIBLE);
+					}
 
-			@Override
-			public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-				itemLayout.setVisibility(View.VISIBLE);
-				progressBar.setVisibility(View.GONE);
-				
-				// rootView의 width를 wrap_content로.
-				rootView.getLayoutParams().height = LayoutParams.WRAP_CONTENT;
-			}
+					@Override
+					public void onLoadingFailed(String imageUri, View view,
+							FailReason failReason) {
+						progressBar.setVisibility(View.GONE);
+					}
 
+					@Override
+					public void onLoadingComplete(String imageUri, View view,
+							Bitmap loadedImage) {
+						imageView.setVisibility(View.VISIBLE);
+						progressBar.setVisibility(View.GONE);
+					}
+
+					@Override
+					public void onLoadingCancelled(String imageUri, View view) {
+						progressBar.setVisibility(View.GONE);
+					}
+				});
+
+		final Button listenTrackButton = (Button) trackListItemView
+				.findViewById(R.id.listenTrackButton);
+		final Button addTrackButton = (Button) trackListItemView
+				.findViewById(R.id.addTrackButton);
+
+		// when click a 'listen' button.
+		listenTrackButton.setOnClickListener(new OnClickListener() {
 			@Override
-			public void onLoadingCancelled(String imageUri, View view) {
-				progressBar.setVisibility(View.GONE);
+			public void onClick(View v) {
+				Intent intent = new Intent(TrackListAdapter.this.activity,
+						MusicPlayerActivity.class);
+
+				Bundle bundle = new Bundle();
+				bundle.putString("method", "listen");
+				bundle.putString("trackId", track.getId());
+				bundle.putString("trackTitle", track.getTrackTitle());
+				bundle.putString("artistName", track.getArtistName());
+				intent.putExtras(bundle);
+
+				intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+				activity.startActivity(intent);
 			}
 		});
-		
-		// load more random images if needed.
-		if (position == getCount() - 1 && !isLoading) {
-			Log.i("ImageListAdapter", "need to load more images.");
-			isLoading = true;
-			((MainActivity)activity).getContentManager().execute(tracksRequest, new TracksRequestListener());
-		}
-		
+
+		// when click an 'add' button.
+		addTrackButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				requestPlayInfo(track.getTrackTitle(), track.getArtistName());
+			}
+		});
+
 		return trackListItemView;
 	}
-	
-	
-	private class TracksRequestListener implements RequestListener<TrackList> {
+
+	public void requestPlayInfo(String trackTitle, String artistName) {
+		PlayInfoRequest playInfoRequest = new PlayInfoRequest(trackTitle,
+				artistName);
+
+		((RoboSherlockSpiceFragmentActivity) activity).getContentManager()
+				.execute(playInfoRequest, new PlayInfoRequestListener());
+	}
+
+	private class PlayInfoRequestListener implements RequestListener<PlayInfo> {
 
 		@Override
 		public void onRequestFailure(SpiceException e) {
-			Log.i("ImageListAdapter", "onRequestFailure()");
-			
-			Toast.makeText( activity,
-					"Error during request: " + e.getMessage(),
+			Toast.makeText(activity, "Error during request: " + e.getMessage(),
 					Toast.LENGTH_LONG).show();
-			
-			isLoading = false;
 		}
 
 		@Override
-		public void onRequestSuccess(TrackList trackList) {
-			Log.i("ImageListAdapter", "onRequestSuccess()");
-			
-			if (trackList == null) {
-				isLoading = false;
+		public void onRequestSuccess(PlayInfo playInfo) {
+			if (playInfo == null) {
 				return;
 			}
-			
-			TrackListAdapter.this.trackList.addAll(trackList);
-			TrackListAdapter.this.notifyDataSetChanged();
-			
-			isLoading = false;
+
+			HowaboutApplication application = (HowaboutApplication) activity
+					.getApplication();
+			application.getMusicPlayList().add(playInfo);
+
+			Toast.makeText(activity, "추가되었습니다.", Toast.LENGTH_LONG).show();
 		}
 	}
+
 }

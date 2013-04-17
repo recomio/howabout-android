@@ -13,8 +13,8 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:name="io.recom.howabout.HowaboutApplication"
@@ -24,11 +24,11 @@
         android:theme="@style/HowaboutCustomTheme" >
         <activity
             android:name="io.recom.howabout.MainActivity"
-            android:label="@string/app_name"
             android:configChanges="keyboardHidden|orientation"
-            >
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -41,15 +41,35 @@
             android:exported="false" />
 
         <activity
-            android:name="io.recom.howabout.ShowImageActivity"
+            android:name="io.recom.howabout.category.activity.ShowImageActivity"
             android:label="@string/title_activity_show_image" >
         </activity>
-        
-        
+        <activity
+            android:name="io.recom.howabout.category.music.activity.RecommendedTrackListActivity"
+            android:label="@string/title_activity_recommended_track_list" >
+        </activity>
+        <activity
+            android:name="io.recom.howabout.category.music.activity.SearchedTrackListActivity"
+            android:label="@string/title_activity_searched_track_list" >
+        </activity>
+        <activity
+            android:name="io.recom.howabout.category.music.activity.MusicPlayerActivity"
+            android:label="@string/title_activity_music_player"
+            android:launchMode="singleInstance" >
+        </activity>
+        <activity
+            android:name="io.recom.howabout.category.music.activity.MusicPlaylistActivity"
+            android:label="@string/title_activity_music_playlist"
+            android:launchMode="singleInstance" >
+        </activity>
+
         <!-- Activities Required by Facebook -->
-        <activity android:name="com.facebook.LoginActivity"/>
-        <meta-data android:value="@string/app_id" android:name="com.facebook.sdk.ApplicationId"/>
-        
+        <activity android:name="com.facebook.LoginActivity" />
+
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/app_id" />
+
     </application>
 
 </manifest>
