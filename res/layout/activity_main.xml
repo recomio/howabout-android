@@ -1,35 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" 
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
+    android:id="@+id/RootView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:id="@+id/RootView"
-    >
-    
-    <LinearLayout
-        android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:layout_weight="1"
-	    android:id="@+id/contentView"
-	    >
-	</LinearLayout>
+    android:orientation="vertical" >
 
-	<LinearLayout
-	    android:id="@+id/adLayout"
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:gravity="center"
-	    android:background="#2a2a2a"	    
-	    android:layout_weight="0" 
-	    >
-	    <com.google.ads.AdView android:id="@+id/adView"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        ads:adUnitId="@string/admob_publisher_id"
-	        ads:adSize="SMART_BANNER"
-	        ads:loadAdOnCreate="true"
-	    />
-	</LinearLayout>
-	
+    <LinearLayout
+        android:id="@+id/contentView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" >
+    </LinearLayout>
+
+    <WebView
+        android:id="@+id/musicPlayerWebView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp" />
+
+    <LinearLayout
+        android:id="@+id/adLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:background="#2a2a2a"
+        android:gravity="center" >
+
+        <com.google.ads.AdView
+            android:id="@+id/adView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            ads:adSize="SMART_BANNER"
+            ads:adUnitId="@string/admob_publisher_id"
+            ads:loadAdOnCreate="true" />
+    </LinearLayout>
+
 </LinearLayout>

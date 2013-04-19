@@ -30,7 +30,7 @@ public class MusicPlaylistAdapter extends BaseAdapter {
 
 		HowaboutApplication application = (HowaboutApplication) activity
 				.getApplication();
-		this.playInfoList = application.getMusicPlayList();
+		this.playInfoList = application.getMusicPlayer().getPlayInfoList();
 		this.imageLoader = ImageLoader.getInstance();
 	}
 

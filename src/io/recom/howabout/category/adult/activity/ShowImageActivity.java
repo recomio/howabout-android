@@ -1,4 +1,4 @@
-package io.recom.howabout.category.activity;
+package io.recom.howabout.category.adult.activity;
 
 import io.recom.howabout.R;
 import io.recom.howabout.category.adult.adapter.ShowImageListAdapter;

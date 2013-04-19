@@ -41,7 +41,7 @@
             android:exported="false" />
 
         <activity
-            android:name="io.recom.howabout.category.activity.ShowImageActivity"
+            android:name="io.recom.howabout.category.adult.activity.ShowImageActivity"
             android:label="@string/title_activity_show_image" >
         </activity>
         <activity
@@ -54,13 +54,11 @@
         </activity>
         <activity
             android:name="io.recom.howabout.category.music.activity.MusicPlayerActivity"
-            android:label="@string/title_activity_music_player"
-            android:launchMode="singleInstance" >
+            android:label="@string/title_activity_music_player" >
         </activity>
         <activity
             android:name="io.recom.howabout.category.music.activity.MusicPlaylistActivity"
-            android:label="@string/title_activity_music_playlist"
-            android:launchMode="singleInstance" >
+            android:label="@string/title_activity_music_playlist" >
         </activity>
 
         <!-- Activities Required by Facebook -->

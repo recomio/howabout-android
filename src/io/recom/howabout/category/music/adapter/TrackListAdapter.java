@@ -174,7 +174,7 @@ public class TrackListAdapter extends BaseAdapter {
 
 			HowaboutApplication application = (HowaboutApplication) activity
 					.getApplication();
-			application.getMusicPlayList().add(playInfo);
+			application.getMusicPlayer().add(playInfo);
 
 			Toast.makeText(activity, "추가되었습니다.", Toast.LENGTH_LONG).show();
 		}

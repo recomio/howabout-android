@@ -4,7 +4,7 @@ import com.github.rtyley.android.sherlock.roboguice.activity.RoboSherlockFragmen
 import com.octo.android.robospice.JacksonSpringAndroidSpiceService;
 import com.octo.android.robospice.SpiceManager;
 
-// RoboSherlockFragmentActivity + RoboSpice.
+// RoboSherlockActivity + RoboSpice.
 public abstract class RoboSherlockSpiceFragmentActivity extends
 		RoboSherlockFragmentActivity {
 

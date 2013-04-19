@@ -1,16 +1,16 @@
 package io.recom.howabout;
 
 import io.recom.howabout.category.adult.fragment.AdultCategoryWrapFragment;
+import io.recom.howabout.category.music.MusicPlayer;
+import io.recom.howabout.category.music.activity.MusicPlayerActivity;
 import io.recom.howabout.category.music.activity.SearchedTrackListActivity;
 import io.recom.howabout.category.music.fragment.MusicCategoryWrapFragment;
-import roboguice.inject.ContentView;
-import roboguice.inject.InjectFragment;
-import roboguice.inject.InjectResource;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.SpinnerAdapter;
 
@@ -21,14 +21,17 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.SearchView;
 
-@ContentView(R.layout.activity_main)
+//@ContentView(R.layout.activity_main)
 public class MainActivity extends RoboSherlockSpiceFragmentActivity {
 
-	@InjectResource(R.array.category_list)
+	// @InjectView(R.id.musicPlayerWebView)
+	private WebView musicPlayerWebView;
+
+	// @InjectResource(R.array.category_list)
 	private String[] categoryStrings;
 
-	@InjectFragment(R.id.contentView)
-	private Fragment contentFragment;
+	// @InjectResource(R.string.title_activity_music_player)
+	private String musicPlayerTitle;
 
 	AdultCategoryWrapFragment adultCategoryWrapFragment;
 	MusicCategoryWrapFragment musicCategoryWrapFragment;
@@ -38,6 +41,12 @@ public class MainActivity extends RoboSherlockSpiceFragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		setContentView(R.layout.activity_main);
+		musicPlayerWebView = (WebView) findViewById(R.id.musicPlayerWebView);
+		categoryStrings = getResources().getStringArray(R.array.category_list);
+		musicPlayerTitle = getResources().getString(
+				R.string.title_activity_music_player);
 
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
@@ -60,6 +69,16 @@ public class MainActivity extends RoboSherlockSpiceFragmentActivity {
 		Bundle musicCategoryWrapFragmentBundle = new Bundle();
 		musicCategoryWrapFragmentBundle.putString("category", "music");
 		musicCategoryWrapFragment.setArguments(musicCategoryWrapFragmentBundle);
+
+		// set music player webView.
+		HowaboutApplication application = (HowaboutApplication) getApplication();
+		MusicPlayer musicPlayer = new MusicPlayer(musicPlayerWebView);
+		application.setMusicPlayer(musicPlayer);
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
 	}
 
 	@Override
@@ -126,13 +145,23 @@ public class MainActivity extends RoboSherlockSpiceFragmentActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item.getTitle().equals(musicPlayerTitle)) {
+			Intent intent = new Intent(this, MusicPlayerActivity.class);
+
+			Bundle bundle = new Bundle();
+			bundle.putString("method", "");
+			intent.putExtras(bundle);
+
+			intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+			startActivity(intent);
+			return true;
+		}
 		return super.onOptionsItemSelected(item);
 	}
 
 	public class HowaboutDropdownNavigationListener implements
 			OnNavigationListener {
-		String[] categoryStrings = getResources().getStringArray(
-				R.array.category_list);
 
 		@Override
 		public boolean onNavigationItemSelected(int position, long itemId) {

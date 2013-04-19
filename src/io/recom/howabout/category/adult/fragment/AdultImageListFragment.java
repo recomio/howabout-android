@@ -5,7 +5,7 @@ import com.octo.android.robospice.request.listener.RequestListener;
 
 import io.recom.howabout.MainActivity;
 import io.recom.howabout.R;
-import io.recom.howabout.category.activity.ShowImageActivity;
+import io.recom.howabout.category.adult.activity.ShowImageActivity;
 import io.recom.howabout.category.adult.adapter.ImageListAdapter;
 import io.recom.howabout.category.adult.model.Image;
 import io.recom.howabout.category.adult.model.ImageList;

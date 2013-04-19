@@ -1,10 +1,6 @@
 package io.recom.howabout;
 
-import io.recom.howabout.category.music.model.PlayInfo;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import io.recom.howabout.category.music.MusicPlayer;
 import android.app.Application;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -13,24 +9,7 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 public class HowaboutApplication extends Application {
 
-	private List<PlayInfo> musicPlayList = new ArrayList<PlayInfo>();
-	private int musicPlaylistPosition = 0;
-
-	public List<PlayInfo> getMusicPlayList() {
-		return musicPlayList;
-	}
-
-	public void setMusicPlayList(List<PlayInfo> musicPlayList) {
-		this.musicPlayList = musicPlayList;
-	}
-
-	public int getMusicPlaylistPosition() {
-		return musicPlaylistPosition;
-	}
-
-	public void setMusicPlaylistPosition(int musicPlaylistPosition) {
-		this.musicPlaylistPosition = musicPlaylistPosition;
-	}
+	protected MusicPlayer musicPlayer;
 
 	@Override
 	public void onCreate() {
@@ -44,5 +23,13 @@ public class HowaboutApplication extends Application {
 				defaultOptions).build();
 
 		ImageLoader.getInstance().init(config);
+	}
+
+	public void setMusicPlayer(MusicPlayer musicPlayer) {
+		this.musicPlayer = musicPlayer;
+	}
+
+	public MusicPlayer getMusicPlayer() {
+		return musicPlayer;
 	}
 }

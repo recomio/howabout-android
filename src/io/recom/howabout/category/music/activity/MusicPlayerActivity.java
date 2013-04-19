@@ -5,17 +5,11 @@ import io.recom.howabout.R;
 import io.recom.howabout.RoboSherlockSpiceFragmentActivity;
 import io.recom.howabout.category.music.model.PlayInfo;
 import io.recom.howabout.category.music.net.PlayInfoRequest;
-
-import java.util.List;
-
+import io.recom.howabout.category.music.net.YoutubeMp4StreamUrlRequest;
 import roboguice.inject.ContentView;
-import roboguice.inject.InjectView;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.webkit.WebChromeClient;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -28,34 +22,12 @@ import com.octo.android.robospice.request.listener.RequestListener;
 @ContentView(R.layout.activity_music_player)
 public class MusicPlayerActivity extends RoboSherlockSpiceFragmentActivity {
 
-	@InjectView(R.id.webView)
-	protected WebView webView;
-
-	@SuppressLint("SetJavaScriptEnabled")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
-
-		webView.getSettings().setJavaScriptEnabled(true);
-		webView.getSettings().setDomStorageEnabled(true);
-		webView.setWebChromeClient(new WebChromeClient());
-		webView.setWebViewClient(new WebViewClient() {
-			@Override
-			public boolean shouldOverrideUrlLoading(WebView view, String url) {
-				view.loadUrl(url);
-				return false;
-			}
-		});
-
-		webView.loadUrl("http://grooveshark.com");
-	}
-
-	@Override
-	public void onStart() {
-		super.onStart();
 
 		Bundle bundle = getIntent().getExtras();
 		String method = bundle.getString("method");
@@ -70,6 +42,11 @@ public class MusicPlayerActivity extends RoboSherlockSpiceFragmentActivity {
 			getContentManager().execute(playInfoRequest,
 					new PlayInfoRequestListener());
 		}
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
 	}
 
 	@Override
@@ -95,11 +72,6 @@ public class MusicPlayerActivity extends RoboSherlockSpiceFragmentActivity {
 	}
 
 	@Override
-	public void onBackPressed() {
-		moveTaskToBack(true);
-	}
-
-	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		MenuInflater inflater = getSupportMenuInflater();
@@ -112,59 +84,64 @@ public class MusicPlayerActivity extends RoboSherlockSpiceFragmentActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			moveTaskToBack(true);
+			finish();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
-	}
-
-	protected void play(int position) {
-		HowaboutApplication application = (HowaboutApplication) getApplication();
-		List<PlayInfo> playlist = application.getMusicPlayList();
-
-		if (position > playlist.size() - 1) {
-			return;
-		}
-
-		PlayInfo playInfo = playlist.get(position);
-
-		evalJS("GS.models.queue.reset();");
-		evalJS("GS.models.queue.addNext( new GS.models.Song({'SongID': "
-				+ playInfo.getGroovesharkSongID() + ", 'SongName': '"
-				+ playInfo.getGroovesharkSongName() + "', 'ArtistID': "
-				+ playInfo.getGroovesharkArtistID() + ", 'ArtistName': '"
-				+ playInfo.getGroovesharkArtistName() + "', 'AlbumID': "
-				+ playInfo.getGroovesharkAlbumID() + ", 'AlbumName': '"
-				+ playInfo.getGroovesharkAlbumName() + "'}) );");
-		evalJS("GS.audio.playNext();");
-
-		application.setMusicPlaylistPosition(position);
-	}
-
-	protected void evalJS(String script) {
-		webView.loadUrl("javascript:" + script);
 	}
 
 	private class PlayInfoRequestListener implements RequestListener<PlayInfo> {
 		@Override
 		public void onRequestFailure(SpiceException e) {
 			Toast.makeText(MusicPlayerActivity.this,
-					"Error during request: " + e.getMessage(),
-					Toast.LENGTH_LONG).show();
+					"이 노래의 무료 스트리밍을 찾지 못했습니다.", Toast.LENGTH_LONG).show();
 		}
 
 		@Override
-		public void onRequestSuccess(PlayInfo playInfo) {
+		public void onRequestSuccess(final PlayInfo playInfo) {
 			if (playInfo == null) {
 				return;
 			}
 
 			HowaboutApplication application = (HowaboutApplication) MusicPlayerActivity.this
 					.getApplication();
-			int position = application.getMusicPlaylistPosition();
-			application.getMusicPlayList().add(position, playInfo);
 
-			play(position);
+			if (playInfo.isGrooveshark()) {
+				application.getMusicPlayer().play(playInfo);
+				Toast.makeText(MusicPlayerActivity.this, "from Grooveshark",
+						Toast.LENGTH_SHORT).show();
+				return;
+			}
+
+			// if have to use youtube, should get youtube mp4 stream url.
+			YoutubeMp4StreamUrlRequest youtubeMp4StreamUrlRequest = new YoutubeMp4StreamUrlRequest(
+					playInfo.getYoutubeMovieId());
+
+			getContentManager().execute(youtubeMp4StreamUrlRequest,
+					new RequestListener<String>() {
+						@Override
+						public void onRequestFailure(SpiceException e) {
+							Toast.makeText(MusicPlayerActivity.this,
+									"Youtube 스트리밍 주소를 가져오지 못했습니다.",
+									Toast.LENGTH_LONG).show();
+						}
+
+						@Override
+						public void onRequestSuccess(String youtubeMp4StreamUrl) {
+							Log.d("youtubeMp4StreamUrl", youtubeMp4StreamUrl);
+
+							playInfo.setYoutubeMp4StreamUrl(youtubeMp4StreamUrl);
+
+							HowaboutApplication application = (HowaboutApplication) MusicPlayerActivity.this
+									.getApplication();
+
+							application.getMusicPlayer().play(playInfo);
+
+							Toast.makeText(MusicPlayerActivity.this,
+									"from Youtube", Toast.LENGTH_SHORT).show();
+						}
+
+					});
 		}
 	}
 

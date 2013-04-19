@@ -24,6 +24,7 @@ public class PlayInfo {
 	protected String thumbnailImageUrl;
 	protected String hqThumbnailImageUrl;
 	protected String duration;
+	protected String youtubeMp4StreamUrl;
 
 	public String getTrackId() {
 		return id;
@@ -181,9 +182,24 @@ public class PlayInfo {
 		this.duration = duration;
 	}
 
+	public String getYoutubeMp4StreamUrl() {
+		return youtubeMp4StreamUrl;
+	}
+
+	public void setYoutubeMp4StreamUrl(String youtubeMp4StreamUrl) {
+		this.youtubeMp4StreamUrl = youtubeMp4StreamUrl;
+	}
+
 	public String getThumbmailUrl() {
 		return "http://image.bugsm.co.kr/album/images/224/"
 				+ (bugsAlbumId / 100) + "/" + bugsAlbumId + ".jpg";
+	}
+
+	public boolean isGrooveshark() {
+		if (groovesharkSongID == null) {
+			return false;
+		}
+		return true;
 	}
 
 }
