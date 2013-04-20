@@ -7,6 +7,8 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
 
 @ContentView(R.layout.activity_track_list)
 public class SearchedTrackListActivity extends TrackListActivity {
@@ -42,6 +44,15 @@ public class SearchedTrackListActivity extends TrackListActivity {
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		MenuInflater inflater = getSupportMenuInflater();
+		inflater.inflate(R.menu.searched_track_list, menu);
+
+		return super.onCreateOptionsMenu(menu);
 	}
 
 }

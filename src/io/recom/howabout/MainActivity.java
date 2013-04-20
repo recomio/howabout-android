@@ -2,7 +2,9 @@ package io.recom.howabout;
 
 import io.recom.howabout.category.adult.fragment.AdultCategoryWrapFragment;
 import io.recom.howabout.category.music.activity.MusicPlayerActivity;
+import io.recom.howabout.category.music.activity.MusicPlaylistActivity;
 import io.recom.howabout.category.music.activity.SearchedTrackListActivity;
+import io.recom.howabout.category.music.adapter.MusicPlaylistAdapter;
 import io.recom.howabout.category.music.fragment.MusicCategoryWrapFragment;
 import io.recom.howabout.category.music.player.MusicPlayer;
 import android.content.Intent;
@@ -33,6 +35,7 @@ public class MainActivity extends RoboSherlockSpiceFragmentActivity {
 
 	// @InjectResource(R.string.title_activity_music_player)
 	private String musicPlayerTitle;
+	private String musicPlaylistTitle;
 
 	AdultCategoryWrapFragment adultCategoryWrapFragment;
 	MusicCategoryWrapFragment musicCategoryWrapFragment;
@@ -48,6 +51,8 @@ public class MainActivity extends RoboSherlockSpiceFragmentActivity {
 		categoryStrings = getResources().getStringArray(R.array.category_list);
 		musicPlayerTitle = getResources().getString(
 				R.string.title_activity_music_player);
+		musicPlaylistTitle = getResources().getString(
+				R.string.title_activity_music_playlist);
 
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
@@ -75,6 +80,8 @@ public class MainActivity extends RoboSherlockSpiceFragmentActivity {
 		HowaboutApplication application = (HowaboutApplication) getApplication();
 		MusicPlayer musicPlayer = new MusicPlayer(this, musicPlayerWebView);
 		application.setMusicPlayer(musicPlayer);
+		musicPlayer.setMusicPlaylistAdapter(new MusicPlaylistAdapter(
+				musicPlayer));
 	}
 
 	@Override
@@ -166,7 +173,19 @@ public class MainActivity extends RoboSherlockSpiceFragmentActivity {
 
 			startActivity(intent);
 			return true;
+
+		} else if (item.getTitle().equals(musicPlaylistTitle)) {
+			Intent intent = new Intent(this, MusicPlaylistActivity.class);
+
+			Bundle bundle = new Bundle();
+			intent.putExtras(bundle);
+
+			intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+			startActivity(intent);
+			return true;
 		}
+
 		return super.onOptionsItemSelected(item);
 	}
 

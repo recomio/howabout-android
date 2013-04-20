@@ -1,12 +1,11 @@
 package io.recom.howabout.category.music.adapter;
 
-import io.recom.howabout.HowaboutApplication;
 import io.recom.howabout.R;
 import io.recom.howabout.category.music.model.PlayInfo;
+import io.recom.howabout.category.music.player.MusicPlayer;
 
 import java.util.List;
 
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,16 +20,14 @@ import com.nostra13.universalimageloader.core.assist.ImageLoadingListener;
 
 public class MusicPlaylistAdapter extends BaseAdapter {
 
-	protected final Activity activity;
+	protected final MusicPlayer musicPlayer;
 	protected final List<PlayInfo> playInfoList;
 	protected ImageLoader imageLoader;
 
-	public MusicPlaylistAdapter(Activity activity) {
-		this.activity = activity;
+	public MusicPlaylistAdapter(MusicPlayer musicPlayer) {
+		this.musicPlayer = musicPlayer;
+		this.playInfoList = musicPlayer.getPlayInfoList();
 
-		HowaboutApplication application = (HowaboutApplication) activity
-				.getApplication();
-		this.playInfoList = application.getMusicPlayer().getPlayInfoList();
 		this.imageLoader = ImageLoader.getInstance();
 	}
 
@@ -71,11 +68,19 @@ public class MusicPlaylistAdapter extends BaseAdapter {
 				.findViewById(R.id.trackTitle);
 		final TextView artistName = (TextView) playlistItemView
 				.findViewById(R.id.artistName);
+		final ImageView imageView1 = (ImageView) playlistItemView
+				.findViewById(R.id.imageView1);
 
 		final PlayInfo playInfo = playInfoList.get(position);
 
 		trackTitle.setText(playInfo.getTrackTitle());
 		artistName.setText(playInfo.getArtistName());
+
+		if (position == musicPlayer.getCurrentPosition()) {
+			imageView1.setVisibility(View.VISIBLE);
+		} else {
+			imageView1.setVisibility(View.GONE);
+		}
 
 		String imageUrl = playInfo.getThumbmailUrl();
 
@@ -83,7 +88,7 @@ public class MusicPlaylistAdapter extends BaseAdapter {
 				new ImageLoadingListener() {
 					@Override
 					public void onLoadingStarted(String imageUri, View view) {
-						imageView.setVisibility(View.INVISIBLE);
+						// imageView.setVisibility(View.INVISIBLE);
 					}
 
 					@Override

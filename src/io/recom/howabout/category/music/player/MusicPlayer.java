@@ -2,6 +2,7 @@ package io.recom.howabout.category.music.player;
 
 import io.recom.howabout.HowaboutApplication;
 import io.recom.howabout.RoboSherlockSpiceFragmentActivity;
+import io.recom.howabout.category.music.adapter.MusicPlaylistAdapter;
 import io.recom.howabout.category.music.model.PlayInfo;
 import io.recom.howabout.category.music.net.PlayInfoRequest;
 import io.recom.howabout.category.music.net.YoutubeMp4StreamUrlRequest;
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.annotation.SuppressLint;
-import android.media.MediaPlayer;
+import android.os.Build;
 import android.util.Log;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -25,17 +26,25 @@ public class MusicPlayer {
 	protected RoboSherlockSpiceFragmentActivity mainActivity;
 	protected RoboSherlockSpiceFragmentActivity lastActivity;
 
+	protected boolean javascriptInterfaceBroken = false;
+
 	protected WebView webView;
-	protected MediaPlayer mediaPlayer;
+	protected JavaScriptInterface javascriptInterface = new JavaScriptInterface();
 
 	protected List<PlayInfo> playInfoList = new ArrayList<PlayInfo>();
 	protected int currentPosition = -1;
 
+	protected MusicPlaylistAdapter musicPlaylistAdapter;
+
 	@SuppressLint("SetJavaScriptEnabled")
 	public MusicPlayer(RoboSherlockSpiceFragmentActivity activity,
-			WebView webView) {
+			final WebView webView) {
 		this.mainActivity = activity;
 		this.webView = webView;
+
+		if (Build.VERSION.RELEASE.startsWith("2.3")) {
+			javascriptInterfaceBroken = true;
+		}
 
 		webView.getSettings().setJavaScriptEnabled(true);
 		webView.getSettings().setDomStorageEnabled(true);
@@ -43,12 +52,45 @@ public class MusicPlayer {
 		webView.setWebViewClient(new WebViewClient() {
 			@Override
 			public boolean shouldOverrideUrlLoading(WebView view, String url) {
+
+				// cause of the android 2.3.x webview javascript interface bug.
+				if (javascriptInterfaceBroken) {
+					if (url.indexOf("AndroidFunctionCall:") >= 0) {
+						String event = url.split(":")[1];
+
+						if (event.equals("onPlay")) {
+							javascriptInterface.onPlay();
+						} else if (event.equals("onEnded")) {
+							javascriptInterface.onEnded();
+						}
+
+						return true;
+					}
+				}
+
 				view.loadUrl(url);
 				return false;
 			}
+
+			@Override
+			public void onPageFinished(WebView view, String url) {
+				addMusicEndedEventListener();
+			}
 		});
 
+		webView.addJavascriptInterface(javascriptInterface, "AndroidFunction");
 		webView.loadUrl("http://grooveshark.com");
+	}
+
+	private void addMusicEndedEventListener() {
+		if (javascriptInterfaceBroken) {
+			evalJS("GS.audio.audio.addEventListener('play', function() { location.href='AndroidFunctionCall:onPlay'; }, false);");
+			evalJS("GS.audio.audio.addEventListener('ended', function() { location.href='AndroidFunctionCall:onEnded'; }, false);");
+		} else {
+			evalJS("GS.audio.audio.addEventListener('play', function() { AndroidFunction.onPlay(); }, false);");
+			evalJS("GS.audio.audio.addEventListener('ended', function() { AndroidFunction.onEnded(); }, false);");
+		}
+
 	}
 
 	public void add(RoboSherlockSpiceFragmentActivity activity,
@@ -90,31 +132,28 @@ public class MusicPlayer {
 	}
 
 	public void play(PlayInfo playInfo) {
-		currentPosition++;
-		add(currentPosition, playInfo);
+		setCurrentPosition(getCurrentPosition() + 1);
+		add(getCurrentPosition(), playInfo);
 
 		play();
 	}
 
 	public void play(int position) {
 		if (playInfoList.size() > position) {
-			currentPosition = position;
+			setCurrentPosition(position);
 			play();
 		}
 	}
 
 	public void play() {
-		if (currentPosition > playInfoList.size() - 1) {
+		if (getCurrentPosition() > playInfoList.size() - 1) {
 			return;
 		}
 
-		PlayInfo playInfo = playInfoList.get(currentPosition);
+		PlayInfo playInfo = playInfoList.get(getCurrentPosition());
 
 		evalJS("GS.models.queue.reset();");
 		evalJS("GS.audio.audio.pause();");
-		if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-			mediaPlayer.stop();
-		}
 
 		if (playInfo.isGrooveshark()) {
 			StringBuilder scriptStringBuilder = new StringBuilder();
@@ -140,17 +179,9 @@ public class MusicPlayer {
 			evalJS("GS.audio.audio.src = \""
 					+ playInfo.getYoutubeMp4StreamUrl() + "\";");
 			evalJS("GS.audio.audio.play();");
-
-			// try {
-			// mediaPlayer = new MediaPlayer();
-			// mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-			// mediaPlayer.setDataSource(playInfo.getYoutubeMp4StreamUrl());
-			// mediaPlayer.prepare(); // might take long! (for buffering, etc)
-			// mediaPlayer.start();
-			// } catch (Exception e) {
-			//
-			// }
 		}
+
+		musicPlaylistAdapter.notifyDataSetChanged();
 	}
 
 	protected void evalJS(String script) {
@@ -165,12 +196,60 @@ public class MusicPlayer {
 		return currentPosition;
 	}
 
-	public void setCurrentPostion(int position) {
+	public void setCurrentPosition(int position) {
 		currentPosition = position;
+
+		musicPlaylistAdapter.notifyDataSetChanged();
+	}
+
+	public boolean next() {
+		if (getCurrentPosition() + 1 == playInfoList.size()) {
+			return false;
+		}
+
+		setCurrentPosition(getCurrentPosition() + 1);
+		return true;
+	}
+
+	public void playNext() {
+		if (!next()) {
+			return;
+		}
+
+		play();
+	}
+
+	public void remove(int position) {
+		if (position == getCurrentPosition()) {
+			pause();
+		}
+
+		if (position < getCurrentPosition()) {
+			setCurrentPosition(getCurrentPosition() - 1);
+		}
+
+		playInfoList.remove(position);
 	}
 
 	public List<PlayInfo> getPlayInfoList() {
 		return playInfoList;
+	}
+
+	public void setMusicPlaylistAdapter(
+			MusicPlaylistAdapter musicPlaylistAdapter) {
+		this.musicPlaylistAdapter = musicPlaylistAdapter;
+	}
+
+	public MusicPlaylistAdapter getMusicPlaylistAdapter() {
+		return musicPlaylistAdapter;
+	}
+
+	public RoboSherlockSpiceFragmentActivity getLastActivity() {
+		return lastActivity;
+	}
+
+	public void setLastActivity(RoboSherlockSpiceFragmentActivity lastActivity) {
+		this.lastActivity = lastActivity;
 	}
 
 	private class ListenPlayInfoRequestListener implements
@@ -240,16 +319,66 @@ public class MusicPlayer {
 		}
 
 		@Override
-		public void onRequestSuccess(PlayInfo playInfo) {
+		public void onRequestSuccess(final PlayInfo playInfo) {
 			if (playInfo == null) {
 				return;
 			}
 
 			HowaboutApplication application = (HowaboutApplication) lastActivity
 					.getApplication();
-			application.getMusicPlayer().add(playInfo);
 
-			Toast.makeText(lastActivity, "추가되었습니다.", Toast.LENGTH_LONG).show();
+			if (playInfo.isGrooveshark()) {
+				application.getMusicPlayer().add(playInfo);
+				Toast.makeText(lastActivity, "from Grooveshark",
+						Toast.LENGTH_SHORT).show();
+				Toast.makeText(lastActivity, "추가되었습니다.", Toast.LENGTH_LONG)
+						.show();
+				return;
+			}
+
+			Toast.makeText(lastActivity, "from Youtube", Toast.LENGTH_SHORT)
+					.show();
+
+			// if have to use youtube, should get youtube mp4 stream url.
+			YoutubeMp4StreamUrlRequest youtubeMp4StreamUrlRequest = new YoutubeMp4StreamUrlRequest(
+					playInfo.getYoutubeMovieId());
+
+			lastActivity.getContentManager().execute(
+					youtubeMp4StreamUrlRequest, new RequestListener<String>() {
+						@Override
+						public void onRequestFailure(SpiceException e) {
+							Toast.makeText(lastActivity,
+									"이 노래의 무료 스트리밍을 찾지 못했습니다.",
+									Toast.LENGTH_LONG).show();
+						}
+
+						@Override
+						public void onRequestSuccess(String youtubeMp4StreamUrl) {
+							Log.d("youtubeMp4StreamUrl", youtubeMp4StreamUrl);
+
+							playInfo.setYoutubeMp4StreamUrl(youtubeMp4StreamUrl);
+
+							HowaboutApplication application = (HowaboutApplication) lastActivity
+									.getApplication();
+
+							application.getMusicPlayer().add(playInfo);
+							Toast.makeText(lastActivity, "추가되었습니다.",
+									Toast.LENGTH_LONG).show();
+						}
+
+					});
+		}
+	}
+
+	public class JavaScriptInterface implements JavascriptCallback {
+		public void onPlay() {
+			Log.i("JavaScriptInterface", "onPlay()");
+		}
+
+		public void onEnded() {
+			Log.i("JavaScriptInterface", "onEnded()");
+
+			playNext();
 		}
 	}
 
