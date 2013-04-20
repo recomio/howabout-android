@@ -1,16 +1,23 @@
 package io.recom.howabout.category.music.activity;
 
+import io.recom.howabout.HowaboutApplication;
 import io.recom.howabout.R;
 import io.recom.howabout.category.music.fragment.RecommendedTrackListFragment;
 import roboguice.inject.ContentView;
+import roboguice.inject.InjectResource;
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 
 @ContentView(R.layout.activity_track_list)
 public class RecommendedTrackListActivity extends TrackListActivity {
+
+	@InjectResource(R.string.listen)
+	protected String listenString;
 
 	protected RecommendedTrackListFragment recommendedTrackListFragment;
 
@@ -50,6 +57,23 @@ public class RecommendedTrackListActivity extends TrackListActivity {
 		inflater.inflate(R.menu.recommended_track_list, menu);
 
 		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item.getTitle().equals(listenString)) {
+			HowaboutApplication application = (HowaboutApplication) getApplication();
+			application.getMusicPlayer().play(
+					RecommendedTrackListActivity.this, trackTitle, artistName);
+
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
 	}
 
 }

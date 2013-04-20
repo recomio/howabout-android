@@ -1,8 +1,6 @@
 package io.recom.howabout.category.music.fragment;
 
-import com.octo.android.robospice.persistence.exception.SpiceException;
-import com.octo.android.robospice.request.listener.RequestListener;
-
+import io.recom.howabout.RoboSherlockSpiceFragmentActivity;
 import io.recom.howabout.category.music.activity.TrackListActivity;
 import io.recom.howabout.category.music.adapter.TrackListAdapter;
 import io.recom.howabout.category.music.model.TrackList;
@@ -11,6 +9,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
+import com.octo.android.robospice.persistence.exception.SpiceException;
+import com.octo.android.robospice.request.listener.RequestListener;
 
 public class RecommendedTrackListFragment extends TrackListFragment {
 
@@ -48,17 +49,19 @@ public class RecommendedTrackListFragment extends TrackListFragment {
 			if (trackList == null) {
 				return;
 			}
-			
+
 			RecommendedTrackListFragment.this.trackList = trackList;
 
-			trackListAdapter = new TrackListAdapter(getActivity(), trackList);
+			trackListAdapter = new TrackListAdapter(
+					(RoboSherlockSpiceFragmentActivity) getActivity(),
+					trackList);
 			imagesGridView.setAdapter(trackListAdapter);
 			trackListAdapter.notifyDataSetChanged();
 
 			progressBar.setVisibility(View.GONE);
 		}
 	}
-	
+
 	@Override
 	protected void performRequest(RequestListener<TrackList> requestListener) {
 		((TrackListActivity) getActivity()).getContentManager().execute(

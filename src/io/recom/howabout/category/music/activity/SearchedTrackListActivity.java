@@ -1,12 +1,12 @@
 package io.recom.howabout.category.music.activity;
 
-import roboguice.inject.ContentView;
-
-import com.actionbarsherlock.app.ActionBar;
-
 import io.recom.howabout.R;
 import io.recom.howabout.category.music.fragment.SearchedTrackListFragment;
+import roboguice.inject.ContentView;
+import android.content.res.Configuration;
 import android.os.Bundle;
+
+import com.actionbarsherlock.app.ActionBar;
 
 @ContentView(R.layout.activity_track_list)
 public class SearchedTrackListActivity extends TrackListActivity {
@@ -37,6 +37,11 @@ public class SearchedTrackListActivity extends TrackListActivity {
 				.beginTransaction()
 				.replace(R.id.contentView, searchedTrackListFragment,
 						"music_search").commit();
+	}
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
 	}
 
 }

@@ -3,8 +3,8 @@
     <item
         android:showAsAction="always|withText"
         android:title="@string/listen"/>
-    <item
+    <!-- <item
         android:showAsAction="always|withText"
-        android:title="@string/add"/>
+        android:title="@string/add"/> -->
 
 </menu>

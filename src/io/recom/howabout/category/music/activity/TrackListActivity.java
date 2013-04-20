@@ -1,13 +1,13 @@
 package io.recom.howabout.category.music.activity;
 
+import io.recom.howabout.R;
+import io.recom.howabout.RoboSherlockSpiceFragmentActivity;
 import roboguice.inject.ContentView;
+import android.content.res.Configuration;
+import android.os.Bundle;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.MenuItem;
-
-import io.recom.howabout.R;
-import io.recom.howabout.RoboSherlockSpiceFragmentActivity;
-import android.os.Bundle;
 
 @ContentView(R.layout.activity_track_list)
 public abstract class TrackListActivity extends
@@ -25,7 +25,7 @@ public abstract class TrackListActivity extends
 	public void onStart() {
 		super.onStart();
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -34,6 +34,11 @@ public abstract class TrackListActivity extends
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
 	}
 
 }

@@ -3,6 +3,7 @@ package io.recom.howabout.category.music.activity;
 import io.recom.howabout.R;
 import io.recom.howabout.RoboSherlockSpiceFragmentActivity;
 import roboguice.inject.ContentView;
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -43,6 +44,11 @@ public class MusicPlaylistActivity extends RoboSherlockSpiceFragmentActivity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
 	}
 
 }

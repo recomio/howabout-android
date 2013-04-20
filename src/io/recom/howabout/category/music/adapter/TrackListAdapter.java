@@ -3,15 +3,9 @@ package io.recom.howabout.category.music.adapter;
 import io.recom.howabout.HowaboutApplication;
 import io.recom.howabout.R;
 import io.recom.howabout.RoboSherlockSpiceFragmentActivity;
-import io.recom.howabout.category.music.activity.MusicPlayerActivity;
-import io.recom.howabout.category.music.model.PlayInfo;
 import io.recom.howabout.category.music.model.Track;
 import io.recom.howabout.category.music.model.TrackList;
-import io.recom.howabout.category.music.net.PlayInfoRequest;
-import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,21 +15,19 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.ImageLoadingListener;
-import com.octo.android.robospice.persistence.exception.SpiceException;
-import com.octo.android.robospice.request.listener.RequestListener;
 
 public class TrackListAdapter extends BaseAdapter {
 
-	protected final Activity activity;
+	protected final RoboSherlockSpiceFragmentActivity activity;
 	protected final TrackList trackList;
 	protected ImageLoader imageLoader;
 
-	public TrackListAdapter(Activity activity, TrackList trackList) {
+	public TrackListAdapter(RoboSherlockSpiceFragmentActivity activity,
+			TrackList trackList) {
 		this.activity = activity;
 		this.trackList = trackList;
 		this.imageLoader = ImageLoader.getInstance();
@@ -123,19 +115,24 @@ public class TrackListAdapter extends BaseAdapter {
 		listenTrackButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(TrackListAdapter.this.activity,
-						MusicPlayerActivity.class);
+				// Intent intent = new Intent(TrackListAdapter.this.activity,
+				// MusicPlayerActivity.class);
+				//
+				// Bundle bundle = new Bundle();
+				// bundle.putString("method", "listen");
+				// bundle.putString("trackId", track.getId());
+				// bundle.putString("trackTitle", track.getTrackTitle());
+				// bundle.putString("artistName", track.getArtistName());
+				// intent.putExtras(bundle);
+				//
+				// intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+				//
+				// activity.startActivity(intent);
 
-				Bundle bundle = new Bundle();
-				bundle.putString("method", "listen");
-				bundle.putString("trackId", track.getId());
-				bundle.putString("trackTitle", track.getTrackTitle());
-				bundle.putString("artistName", track.getArtistName());
-				intent.putExtras(bundle);
-
-				intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-				activity.startActivity(intent);
+				HowaboutApplication application = (HowaboutApplication) activity
+						.getApplication();
+				application.getMusicPlayer().play(activity,
+						track.getTrackTitle(), track.getArtistName());
 			}
 		});
 
@@ -143,41 +140,14 @@ public class TrackListAdapter extends BaseAdapter {
 		addTrackButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				requestPlayInfo(track.getTrackTitle(), track.getArtistName());
+				HowaboutApplication application = (HowaboutApplication) activity
+						.getApplication();
+				application.getMusicPlayer().add(activity,
+						track.getTrackTitle(), track.getArtistName());
 			}
 		});
 
 		return trackListItemView;
-	}
-
-	public void requestPlayInfo(String trackTitle, String artistName) {
-		PlayInfoRequest playInfoRequest = new PlayInfoRequest(trackTitle,
-				artistName);
-
-		((RoboSherlockSpiceFragmentActivity) activity).getContentManager()
-				.execute(playInfoRequest, new PlayInfoRequestListener());
-	}
-
-	private class PlayInfoRequestListener implements RequestListener<PlayInfo> {
-
-		@Override
-		public void onRequestFailure(SpiceException e) {
-			Toast.makeText(activity, "Error during request: " + e.getMessage(),
-					Toast.LENGTH_LONG).show();
-		}
-
-		@Override
-		public void onRequestSuccess(PlayInfo playInfo) {
-			if (playInfo == null) {
-				return;
-			}
-
-			HowaboutApplication application = (HowaboutApplication) activity
-					.getApplication();
-			application.getMusicPlayer().add(playInfo);
-
-			Toast.makeText(activity, "추가되었습니다.", Toast.LENGTH_LONG).show();
-		}
 	}
 
 }

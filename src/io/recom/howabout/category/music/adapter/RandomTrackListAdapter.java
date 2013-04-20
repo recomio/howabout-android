@@ -1,24 +1,24 @@
 package io.recom.howabout.category.music.adapter;
 
 import io.recom.howabout.MainActivity;
+import io.recom.howabout.RoboSherlockSpiceFragmentActivity;
 import io.recom.howabout.category.music.model.TrackList;
 import io.recom.howabout.category.music.net.RandomTracksRequest;
-
-import com.octo.android.robospice.persistence.exception.SpiceException;
-import com.octo.android.robospice.request.listener.RequestListener;
-
-import android.app.Activity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import com.octo.android.robospice.persistence.exception.SpiceException;
+import com.octo.android.robospice.request.listener.RequestListener;
 
 public class RandomTrackListAdapter extends TrackListAdapter {
 
 	protected RandomTracksRequest tracksRequest = new RandomTracksRequest();
 	protected boolean isLoading = false;
 
-	public RandomTrackListAdapter(Activity activity, TrackList trackList) {
+	public RandomTrackListAdapter(RoboSherlockSpiceFragmentActivity activity,
+			TrackList trackList) {
 		super(activity, trackList);
 	}
 

@@ -8,6 +8,7 @@ import io.recom.howabout.category.music.net.PlayInfoRequest;
 import io.recom.howabout.category.music.net.YoutubeMp4StreamUrlRequest;
 import roboguice.inject.ContentView;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -88,6 +89,11 @@ public class MusicPlayerActivity extends RoboSherlockSpiceFragmentActivity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
 	}
 
 	private class PlayInfoRequestListener implements RequestListener<PlayInfo> {

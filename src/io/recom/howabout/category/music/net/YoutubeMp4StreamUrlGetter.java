@@ -55,6 +55,12 @@ public class YoutubeMp4StreamUrlGetter {
 			}
 		}
 
+		for (Video video : videos) {
+			if (video.ext.equals("3GP")) {
+				return video.url;
+			}
+		}
+
 		throw new Exception("no youtube movie.");
 	}
 
@@ -140,7 +146,7 @@ public class YoutubeMp4StreamUrlGetter {
 						.replace(" ", "");
 				value = value.replace("u0026", "&");
 				if (value.endsWith("}")) {
-					value = value.substring(0, value.length() - 2);
+					value = value.substring(0, value.length() - 1);
 				}
 				url = value;
 			}

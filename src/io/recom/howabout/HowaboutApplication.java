@@ -1,6 +1,6 @@
 package io.recom.howabout;
 
-import io.recom.howabout.category.music.MusicPlayer;
+import io.recom.howabout.category.music.player.MusicPlayer;
 import android.app.Application;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;

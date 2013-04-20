@@ -1,11 +1,12 @@
 package io.recom.howabout;
 
 import io.recom.howabout.category.adult.fragment.AdultCategoryWrapFragment;
-import io.recom.howabout.category.music.MusicPlayer;
 import io.recom.howabout.category.music.activity.MusicPlayerActivity;
 import io.recom.howabout.category.music.activity.SearchedTrackListActivity;
 import io.recom.howabout.category.music.fragment.MusicCategoryWrapFragment;
+import io.recom.howabout.category.music.player.MusicPlayer;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -72,13 +73,22 @@ public class MainActivity extends RoboSherlockSpiceFragmentActivity {
 
 		// set music player webView.
 		HowaboutApplication application = (HowaboutApplication) getApplication();
-		MusicPlayer musicPlayer = new MusicPlayer(musicPlayerWebView);
+		MusicPlayer musicPlayer = new MusicPlayer(this, musicPlayerWebView);
 		application.setMusicPlayer(musicPlayer);
 	}
 
 	@Override
 	public void onStart() {
 		super.onStart();
+	}
+
+	@Override
+	public void onDestroy() {
+		HowaboutApplication application = (HowaboutApplication) getApplication();
+		MusicPlayer musicPlayer = application.getMusicPlayer();
+		musicPlayer.pause();
+
+		super.onDestroy();
 	}
 
 	@Override
@@ -170,10 +180,10 @@ public class MainActivity extends RoboSherlockSpiceFragmentActivity {
 			Fragment categoryWrapFragment;
 
 			if (position == 0) {
-				categoryWrapFragment = MainActivity.this.adultCategoryWrapFragment;
-			} else {
 				searchMenu.setVisible(true);
 				categoryWrapFragment = MainActivity.this.musicCategoryWrapFragment;
+			} else {
+				categoryWrapFragment = MainActivity.this.adultCategoryWrapFragment;
 			}
 
 			getSupportFragmentManager()
@@ -183,6 +193,11 @@ public class MainActivity extends RoboSherlockSpiceFragmentActivity {
 
 			return true;
 		}
+	}
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
 	}
 
 }

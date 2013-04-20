@@ -24,7 +24,7 @@
         android:theme="@style/HowaboutCustomTheme" >
         <activity
             android:name="io.recom.howabout.MainActivity"
-            android:configChanges="keyboardHidden|orientation"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -46,19 +46,22 @@
         </activity>
         <activity
             android:name="io.recom.howabout.category.music.activity.RecommendedTrackListActivity"
-            android:label="@string/title_activity_recommended_track_list" >
+            android:label="@string/title_activity_recommended_track_list"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" >
         </activity>
         <activity
             android:name="io.recom.howabout.category.music.activity.SearchedTrackListActivity"
-            android:label="@string/title_activity_searched_track_list" >
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" >
         </activity>
         <activity
             android:name="io.recom.howabout.category.music.activity.MusicPlayerActivity"
-            android:label="@string/title_activity_music_player" >
+            android:label="@string/title_activity_music_player"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" >
         </activity>
         <activity
             android:name="io.recom.howabout.category.music.activity.MusicPlaylistActivity"
-            android:label="@string/title_activity_music_playlist" >
+            android:label="@string/title_activity_music_playlist"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" >
         </activity>
 
         <!-- Activities Required by Facebook -->

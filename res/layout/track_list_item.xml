@@ -55,7 +55,8 @@
                     android:textColor="#666666"
                     android:textStyle="bold"
                     android:text="@string/add"
-                    android:focusable="false" />
+                    android:focusable="false"
+                    android:visibility="gone" />
             </LinearLayout>
 
         </RelativeLayout>
