@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.annotation.SuppressLint;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.util.Log;
 import android.webkit.WebChromeClient;
@@ -30,6 +31,8 @@ public class MusicPlayer {
 
 	protected WebView webView;
 	protected JavaScriptInterface javascriptInterface = new JavaScriptInterface();
+
+	protected MediaPlayer mediaPlayer = new MediaPlayer();
 
 	protected List<PlayInfo> playInfoList = new ArrayList<PlayInfo>();
 	protected int currentPosition = -1;
@@ -56,9 +59,21 @@ public class MusicPlayer {
 				// cause of the android 2.3.x webview javascript interface bug.
 				if (javascriptInterfaceBroken) {
 					if (url.indexOf("AndroidFunctionCall:") >= 0) {
-						String event = url.split(":")[1];
+						String stringArray[] = url.split(":");
+						String event = stringArray[1];
 
-						if (event.equals("onPlay")) {
+						if (event.equals("onLoadStart")) {
+							String src = "";
+							for (int i = 2; i < stringArray.length; i++) {
+								if (i > 2) {
+									src += ":";
+								}
+								src += stringArray[i];
+							}
+							if (!src.equals("http://grooveshark.com/")) {
+								javascriptInterface.onLoadStart(src);
+							}
+						} else if (event.equals("onPlay")) {
 							javascriptInterface.onPlay();
 						} else if (event.equals("onEnded")) {
 							javascriptInterface.onEnded();
@@ -75,6 +90,8 @@ public class MusicPlayer {
 			@Override
 			public void onPageFinished(WebView view, String url) {
 				addMusicEndedEventListener();
+
+				Log.i("onPageFinished", "onPageFinished()");
 			}
 		});
 
@@ -84,9 +101,11 @@ public class MusicPlayer {
 
 	private void addMusicEndedEventListener() {
 		if (javascriptInterfaceBroken) {
+			evalJS("GS.audio.audio.addEventListener('loadstart', function() { location.href='AndroidFunctionCall:onLoadStart:' + GS.audio.audio.src; }, false);");
 			evalJS("GS.audio.audio.addEventListener('play', function() { location.href='AndroidFunctionCall:onPlay'; }, false);");
 			evalJS("GS.audio.audio.addEventListener('ended', function() { location.href='AndroidFunctionCall:onEnded'; }, false);");
 		} else {
+			evalJS("GS.audio.audio.addEventListener('loadstart', function() { AndroidFunction.onLoadStart( GS.audio.audio.src ); }, false);");
 			evalJS("GS.audio.audio.addEventListener('play', function() { AndroidFunction.onPlay(); }, false);");
 			evalJS("GS.audio.audio.addEventListener('ended', function() { AndroidFunction.onEnded(); }, false);");
 		}
@@ -145,6 +164,19 @@ public class MusicPlayer {
 		}
 	}
 
+	public void play(String src) {
+		Log.i("play", src);
+
+		try {
+			mediaPlayer.reset();
+			mediaPlayer.setDataSource(src);
+			mediaPlayer.prepare();
+			mediaPlayer.start();
+		} catch (Exception e) {
+			Log.d("MediaPlayer", e.toString());
+		}
+	}
+
 	public void play() {
 		if (getCurrentPosition() > playInfoList.size() - 1) {
 			return;
@@ -154,6 +186,10 @@ public class MusicPlayer {
 
 		evalJS("GS.models.queue.reset();");
 		evalJS("GS.audio.audio.pause();");
+
+		if (mediaPlayer.isPlaying()) {
+			mediaPlayer.pause();
+		}
 
 		if (playInfo.isGrooveshark()) {
 			StringBuilder scriptStringBuilder = new StringBuilder();
@@ -176,9 +212,10 @@ public class MusicPlayer {
 
 		} else {
 
-			evalJS("GS.audio.audio.src = \""
-					+ playInfo.getYoutubeMp4StreamUrl() + "\";");
-			evalJS("GS.audio.audio.play();");
+			// evalJS("GS.audio.audio.src = \""
+			// + playInfo.getYoutubeMp4StreamUrl() + "\";");
+			// evalJS("GS.audio.audio.play();");
+			play(playInfo.getYoutubeMp4StreamUrl());
 		}
 
 		musicPlaylistAdapter.notifyDataSetChanged();
@@ -190,6 +227,9 @@ public class MusicPlayer {
 
 	public void pause() {
 		evalJS("GS.audio.audio.pause();");
+		if (mediaPlayer.isPlaying()) {
+			mediaPlayer.pause();
+		}
 	}
 
 	public int getCurrentPosition() {
@@ -371,6 +411,13 @@ public class MusicPlayer {
 	}
 
 	public class JavaScriptInterface implements JavascriptCallback {
+		public void onLoadStart(String src) {
+			Log.i("JavaScriptInterface", "onPlay(): " + src);
+
+			pause();
+			play(src);
+		}
+
 		public void onPlay() {
 			Log.i("JavaScriptInterface", "onPlay()");
 		}

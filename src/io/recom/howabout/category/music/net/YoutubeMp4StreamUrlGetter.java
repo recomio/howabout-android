@@ -16,6 +16,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
 
+import android.util.Log;
+
 // from http://stackoverflow.com/questions/15240011/get-the-download-url-for-youtube-video-android-java
 public class YoutubeMp4StreamUrlGetter {
 
@@ -91,7 +93,8 @@ public class YoutubeMp4StreamUrlGetter {
 		StringBuilder str = new StringBuilder();
 		String line = null;
 		while ((line = reader.readLine()) != null) {
-			str.append(line.replace("\\u0026", "&"));
+			Log.i("html", line);
+			str.append(line.replace("\\\\u0026", "&"));
 			str.append(line.replace("\\", ""));
 		}
 		in.close();
