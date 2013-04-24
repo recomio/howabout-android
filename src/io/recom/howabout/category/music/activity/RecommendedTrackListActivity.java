@@ -18,6 +18,8 @@ public class RecommendedTrackListActivity extends TrackListActivity {
 
 	@InjectResource(R.string.listen)
 	protected String listenString;
+	@InjectResource(R.string.add)
+	protected String addString;
 
 	protected RecommendedTrackListFragment recommendedTrackListFragment;
 
@@ -61,13 +63,20 @@ public class RecommendedTrackListActivity extends TrackListActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		HowaboutApplication application = (HowaboutApplication) getApplication();
+
 		if (item.getTitle().equals(listenString)) {
-			HowaboutApplication application = (HowaboutApplication) getApplication();
 			application.getMusicPlayer().play(
 					RecommendedTrackListActivity.this, trackTitle, artistName);
 
 			return true;
+		} else if (item.getTitle().equals(addString)) {
+			application.getMusicPlayer().add(RecommendedTrackListActivity.this,
+					trackTitle, artistName);
+
+			return true;
 		}
+
 		return super.onOptionsItemSelected(item);
 	}
 

@@ -3,12 +3,12 @@
     <item
         android:showAsAction="always|withText"
         android:title="@string/listen" />
-    <!-- <item
+    <item
         android:showAsAction="always|withText"
-        android:title="@string/add" /> -->
-    <!-- <item
+        android:title="@string/add" />
+    <item
         android:showAsAction="always|withText"
         android:icon="@android:drawable/ic_media_play"
-        android:title="@string/title_activity_music_playlist" /> -->
+        android:title="@string/title_activity_music_playlist" />
 
 </menu>

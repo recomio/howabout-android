@@ -41,9 +41,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     style="?android:attr/buttonStyleSmall"
-                    android:textColor="#666666"
+                    android:textColor="#bbbbbb"
                     android:textStyle="bold"
                     android:text="@string/listen"
+                    android:shadowColor="#333333"
+                    android:shadowDx="1"
+                    android:shadowDy="1"
+                    android:shadowRadius="1"
                     android:focusable="false"
                     android:focusableInTouchMode="false" />
 
@@ -52,11 +56,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     style="?android:attr/buttonStyleSmall"
-                    android:textColor="#666666"
+                    android:textColor="#bbbbbb"
                     android:textStyle="bold"
                     android:text="@string/add"
-                    android:focusable="false"
-                    android:visibility="gone" />
+                    android:shadowColor="#333333"
+                    android:shadowDx="1"
+                    android:shadowDy="1"
+                    android:shadowRadius="1"
+                    android:focusable="false" />
             </LinearLayout>
 
         </RelativeLayout>

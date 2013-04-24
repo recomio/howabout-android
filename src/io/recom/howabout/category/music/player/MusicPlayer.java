@@ -12,6 +12,8 @@ import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
+import android.media.MediaPlayer.OnPreparedListener;
 import android.os.Build;
 import android.util.Log;
 import android.webkit.WebChromeClient;
@@ -44,6 +46,19 @@ public class MusicPlayer {
 			final WebView webView) {
 		this.mainActivity = activity;
 		this.webView = webView;
+
+		mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
+			@Override
+			public void onCompletion(MediaPlayer mediaPlayer) {
+				playNext();
+			}
+		});
+		mediaPlayer.setOnPreparedListener(new OnPreparedListener() {
+			@Override
+			public void onPrepared(MediaPlayer mediaPlayer) {
+				mediaPlayer.start();
+			}
+		});
 
 		if (Build.VERSION.RELEASE.startsWith("2.3")) {
 			javascriptInterfaceBroken = true;
@@ -165,13 +180,16 @@ public class MusicPlayer {
 	}
 
 	public void play(String src) {
+		if (src.equals("http://grooveshark.com/")) {
+			return;
+		}
+
 		Log.i("play", src);
 
 		try {
 			mediaPlayer.reset();
 			mediaPlayer.setDataSource(src);
-			mediaPlayer.prepare();
-			mediaPlayer.start();
+			mediaPlayer.prepareAsync();
 		} catch (Exception e) {
 			Log.d("MediaPlayer", e.toString());
 		}
@@ -412,7 +430,7 @@ public class MusicPlayer {
 
 	public class JavaScriptInterface implements JavascriptCallback {
 		public void onLoadStart(String src) {
-			Log.i("JavaScriptInterface", "onPlay(): " + src);
+			Log.i("JavaScriptInterface", "onLoadStart(): " + src);
 
 			pause();
 			play(src);
