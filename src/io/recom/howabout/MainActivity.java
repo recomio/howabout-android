@@ -6,14 +6,15 @@ import io.recom.howabout.category.music.activity.MusicPlaylistActivity;
 import io.recom.howabout.category.music.activity.SearchedTrackListActivity;
 import io.recom.howabout.category.music.adapter.MusicPlaylistAdapter;
 import io.recom.howabout.category.music.fragment.MusicCategoryWrapFragment;
+import io.recom.howabout.category.music.player.GroovesharkWebView;
 import io.recom.howabout.category.music.player.MusicPlayer;
+import io.recom.howabout.category.music.service.MusicPlayerService;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.View;
-import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.SpinnerAdapter;
 
@@ -25,10 +26,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.SearchView;
 
 //@ContentView(R.layout.activity_main)
-public class MainActivity extends RoboSherlockSpiceFragmentActivity {
-
-	// @InjectView(R.id.musicPlayerWebView)
-	private WebView musicPlayerWebView;
+public class MainActivity extends RoboSherlockSpiceGroovesharkFragmentActivity {
 
 	// @InjectResource(R.array.category_list)
 	private String[] categoryStrings;
@@ -47,7 +45,10 @@ public class MainActivity extends RoboSherlockSpiceFragmentActivity {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_main);
-		musicPlayerWebView = (WebView) findViewById(R.id.musicPlayerWebView);
+
+		groovesharkWebView = (GroovesharkWebView) findViewById(R.id.groovesharkWebView);
+		groovesharkWebView.init();
+
 		categoryStrings = getResources().getStringArray(R.array.category_list);
 		musicPlayerTitle = getResources().getString(
 				R.string.title_activity_music_player);
@@ -78,7 +79,7 @@ public class MainActivity extends RoboSherlockSpiceFragmentActivity {
 
 		// set music player webView.
 		HowaboutApplication application = (HowaboutApplication) getApplication();
-		MusicPlayer musicPlayer = new MusicPlayer(this, musicPlayerWebView);
+		MusicPlayer musicPlayer = new MusicPlayer(this, groovesharkWebView);
 		application.setMusicPlayer(musicPlayer);
 		musicPlayer.setMusicPlaylistAdapter(new MusicPlaylistAdapter(
 				musicPlayer));
@@ -94,6 +95,8 @@ public class MainActivity extends RoboSherlockSpiceFragmentActivity {
 		HowaboutApplication application = (HowaboutApplication) getApplication();
 		MusicPlayer musicPlayer = application.getMusicPlayer();
 		musicPlayer.pause();
+
+		stopService(new Intent(this, MusicPlayerService.class));
 
 		super.onDestroy();
 	}

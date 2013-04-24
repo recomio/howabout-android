@@ -6,19 +6,18 @@ import io.recom.howabout.category.music.adapter.MusicPlaylistAdapter;
 import io.recom.howabout.category.music.model.PlayInfo;
 import io.recom.howabout.category.music.net.PlayInfoRequest;
 import io.recom.howabout.category.music.net.YoutubeMp4StreamUrlRequest;
+import io.recom.howabout.category.music.service.MusicPlayerService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
-import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
-import android.webkit.WebChromeClient;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 import com.octo.android.robospice.persistence.exception.SpiceException;
@@ -26,13 +25,8 @@ import com.octo.android.robospice.request.listener.RequestListener;
 
 public class MusicPlayer {
 
-	protected RoboSherlockSpiceFragmentActivity mainActivity;
-	protected RoboSherlockSpiceFragmentActivity lastActivity;
-
-	protected boolean javascriptInterfaceBroken = false;
-
-	protected WebView webView;
-	protected JavaScriptInterface javascriptInterface = new JavaScriptInterface();
+	protected RoboSherlockSpiceFragmentActivity activity;
+	protected GroovesharkWebView groovesharkWebView;
 
 	protected MediaPlayer mediaPlayer = new MediaPlayer();
 
@@ -43,9 +37,9 @@ public class MusicPlayer {
 
 	@SuppressLint("SetJavaScriptEnabled")
 	public MusicPlayer(RoboSherlockSpiceFragmentActivity activity,
-			final WebView webView) {
-		this.mainActivity = activity;
-		this.webView = webView;
+			GroovesharkWebView groovesharkWebView) {
+		setActivity(activity);
+		setGroovesharkWebView(groovesharkWebView);
 
 		mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
 			@Override
@@ -59,77 +53,11 @@ public class MusicPlayer {
 				mediaPlayer.start();
 			}
 		});
-
-		if (Build.VERSION.RELEASE.startsWith("2.3")) {
-			javascriptInterfaceBroken = true;
-		}
-
-		webView.getSettings().setJavaScriptEnabled(true);
-		webView.getSettings().setDomStorageEnabled(true);
-		webView.setWebChromeClient(new WebChromeClient());
-		webView.setWebViewClient(new WebViewClient() {
-			@Override
-			public boolean shouldOverrideUrlLoading(WebView view, String url) {
-
-				// cause of the android 2.3.x webview javascript interface bug.
-				if (javascriptInterfaceBroken) {
-					if (url.indexOf("AndroidFunctionCall:") >= 0) {
-						String stringArray[] = url.split(":");
-						String event = stringArray[1];
-
-						if (event.equals("onLoadStart")) {
-							String src = "";
-							for (int i = 2; i < stringArray.length; i++) {
-								if (i > 2) {
-									src += ":";
-								}
-								src += stringArray[i];
-							}
-							if (!src.equals("http://grooveshark.com/")) {
-								javascriptInterface.onLoadStart(src);
-							}
-						} else if (event.equals("onPlay")) {
-							javascriptInterface.onPlay();
-						} else if (event.equals("onEnded")) {
-							javascriptInterface.onEnded();
-						}
-
-						return true;
-					}
-				}
-
-				view.loadUrl(url);
-				return false;
-			}
-
-			@Override
-			public void onPageFinished(WebView view, String url) {
-				addMusicEndedEventListener();
-
-				Log.i("onPageFinished", "onPageFinished()");
-			}
-		});
-
-		webView.addJavascriptInterface(javascriptInterface, "AndroidFunction");
-		webView.loadUrl("http://grooveshark.com");
-	}
-
-	private void addMusicEndedEventListener() {
-		if (javascriptInterfaceBroken) {
-			evalJS("GS.audio.audio.addEventListener('loadstart', function() { location.href='AndroidFunctionCall:onLoadStart:' + GS.audio.audio.src; }, false);");
-			evalJS("GS.audio.audio.addEventListener('play', function() { location.href='AndroidFunctionCall:onPlay'; }, false);");
-			evalJS("GS.audio.audio.addEventListener('ended', function() { location.href='AndroidFunctionCall:onEnded'; }, false);");
-		} else {
-			evalJS("GS.audio.audio.addEventListener('loadstart', function() { AndroidFunction.onLoadStart( GS.audio.audio.src ); }, false);");
-			evalJS("GS.audio.audio.addEventListener('play', function() { AndroidFunction.onPlay(); }, false);");
-			evalJS("GS.audio.audio.addEventListener('ended', function() { AndroidFunction.onEnded(); }, false);");
-		}
-
 	}
 
 	public void add(RoboSherlockSpiceFragmentActivity activity,
 			String trackTitle, String artistName) {
-		lastActivity = activity;
+		setActivity(activity);
 
 		PlayInfoRequest playInfoRequest = new PlayInfoRequest(trackTitle,
 				artistName);
@@ -155,8 +83,10 @@ public class MusicPlayer {
 	}
 
 	public void play(RoboSherlockSpiceFragmentActivity activity,
-			String trackTitle, String artistName) {
-		lastActivity = activity;
+			GroovesharkWebView groovesharkWebView, String trackTitle,
+			String artistName) {
+		setActivity(activity);
+		setGroovesharkWebView(groovesharkWebView);
 
 		PlayInfoRequest playInfoRequest = new PlayInfoRequest(trackTitle,
 				artistName);
@@ -202,49 +132,31 @@ public class MusicPlayer {
 
 		PlayInfo playInfo = playInfoList.get(getCurrentPosition());
 
-		evalJS("GS.models.queue.reset();");
-		evalJS("GS.audio.audio.pause();");
-
 		if (mediaPlayer.isPlaying()) {
 			mediaPlayer.pause();
 		}
 
+		groovesharkWebView.pause();
+
 		if (playInfo.isGrooveshark()) {
-			StringBuilder scriptStringBuilder = new StringBuilder();
-			scriptStringBuilder
-					.append("GS.models.queue.addNext( new GS.models.Song({\"SongID\": ");
-			scriptStringBuilder.append(playInfo.getGroovesharkSongID());
-			scriptStringBuilder.append(", \"SongName\": \"");
-			scriptStringBuilder.append(playInfo.getGroovesharkSongName());
-			scriptStringBuilder.append("\", \"ArtistID\": ");
-			scriptStringBuilder.append(playInfo.getGroovesharkArtistID());
-			scriptStringBuilder.append(", \"ArtistName\": \"");
-			scriptStringBuilder.append(playInfo.getGroovesharkArtistName());
-			scriptStringBuilder.append("\", \"AlbumID\": ");
-			scriptStringBuilder.append(playInfo.getGroovesharkAlbumID());
-			scriptStringBuilder.append(", \"AlbumName\": \"");
-			scriptStringBuilder.append(playInfo.getGroovesharkAlbumName());
-			scriptStringBuilder.append("\"}) );");
-			evalJS(scriptStringBuilder.toString());
-			evalJS("GS.audio.playNext();");
-
+			groovesharkWebView.play(playInfo);
 		} else {
-
-			// evalJS("GS.audio.audio.src = \""
-			// + playInfo.getYoutubeMp4StreamUrl() + "\";");
-			// evalJS("GS.audio.audio.play();");
 			play(playInfo.getYoutubeMp4StreamUrl());
 		}
 
 		musicPlaylistAdapter.notifyDataSetChanged();
-	}
 
-	protected void evalJS(String script) {
-		webView.loadUrl("javascript:" + script);
+		Intent intent = new Intent(activity, MusicPlayerService.class);
+		Bundle bundle = new Bundle();
+		bundle.putString("trackTitle", playInfo.getTrackTitle());
+		bundle.putString("artistName", playInfo.getArtistName());
+		intent.putExtras(bundle);
+		activity.startService(intent);
 	}
 
 	public void pause() {
-		evalJS("GS.audio.audio.pause();");
+		groovesharkWebView.pause();
+
 		if (mediaPlayer.isPlaying()) {
 			mediaPlayer.pause();
 		}
@@ -302,19 +214,39 @@ public class MusicPlayer {
 		return musicPlaylistAdapter;
 	}
 
-	public RoboSherlockSpiceFragmentActivity getLastActivity() {
-		return lastActivity;
+	public RoboSherlockSpiceFragmentActivity getActivity() {
+		return activity;
 	}
 
-	public void setLastActivity(RoboSherlockSpiceFragmentActivity lastActivity) {
-		this.lastActivity = lastActivity;
+	public void setActivity(RoboSherlockSpiceFragmentActivity activity) {
+		this.activity = activity;
+	}
+
+	public void setGroovesharkWebView(GroovesharkWebView groovesharkWebView) {
+		this.groovesharkWebView = groovesharkWebView;
+		this.groovesharkWebView
+				.setOnGroovesharkListener(new OnGroovesharkListener() {
+					@Override
+					public void onLoadStart(String src) {
+						pause();
+						play(src);
+					}
+
+					@Override
+					public void onPlay() {
+					}
+
+					@Override
+					public void onEnded() {
+					}
+				});
 	}
 
 	private class ListenPlayInfoRequestListener implements
 			RequestListener<PlayInfo> {
 		@Override
 		public void onRequestFailure(SpiceException e) {
-			Toast.makeText(lastActivity, "이 노래의 무료 스트리밍을 찾지 못했습니다.",
+			Toast.makeText(activity, "이 노래의 무료 스트리밍을 찾지 못했습니다.",
 					Toast.LENGTH_LONG).show();
 		}
 
@@ -324,28 +256,27 @@ public class MusicPlayer {
 				return;
 			}
 
-			HowaboutApplication application = (HowaboutApplication) lastActivity
+			HowaboutApplication application = (HowaboutApplication) activity
 					.getApplication();
 
 			if (playInfo.isGrooveshark()) {
 				application.getMusicPlayer().play(playInfo);
-				Toast.makeText(lastActivity, "from Grooveshark",
-						Toast.LENGTH_SHORT).show();
+				Toast.makeText(activity, "from Grooveshark", Toast.LENGTH_SHORT)
+						.show();
 				return;
 			}
 
-			Toast.makeText(lastActivity, "from Youtube", Toast.LENGTH_SHORT)
-					.show();
+			Toast.makeText(activity, "from Youtube", Toast.LENGTH_SHORT).show();
 
 			// if have to use youtube, should get youtube mp4 stream url.
 			YoutubeMp4StreamUrlRequest youtubeMp4StreamUrlRequest = new YoutubeMp4StreamUrlRequest(
 					playInfo.getYoutubeMovieId());
 
-			lastActivity.getContentManager().execute(
-					youtubeMp4StreamUrlRequest, new RequestListener<String>() {
+			activity.getContentManager().execute(youtubeMp4StreamUrlRequest,
+					new RequestListener<String>() {
 						@Override
 						public void onRequestFailure(SpiceException e) {
-							Toast.makeText(lastActivity,
+							Toast.makeText(activity,
 									"이 노래의 무료 스트리밍을 찾지 못했습니다.",
 									Toast.LENGTH_LONG).show();
 						}
@@ -356,7 +287,7 @@ public class MusicPlayer {
 
 							playInfo.setYoutubeMp4StreamUrl(youtubeMp4StreamUrl);
 
-							HowaboutApplication application = (HowaboutApplication) lastActivity
+							HowaboutApplication application = (HowaboutApplication) activity
 									.getApplication();
 
 							application.getMusicPlayer().play(playInfo);
@@ -371,8 +302,7 @@ public class MusicPlayer {
 
 		@Override
 		public void onRequestFailure(SpiceException e) {
-			Toast.makeText(lastActivity,
-					"Error during request: " + e.getMessage(),
+			Toast.makeText(activity, "Error during request: " + e.getMessage(),
 					Toast.LENGTH_LONG).show();
 		}
 
@@ -382,30 +312,28 @@ public class MusicPlayer {
 				return;
 			}
 
-			HowaboutApplication application = (HowaboutApplication) lastActivity
+			HowaboutApplication application = (HowaboutApplication) activity
 					.getApplication();
 
 			if (playInfo.isGrooveshark()) {
 				application.getMusicPlayer().add(playInfo);
-				Toast.makeText(lastActivity, "from Grooveshark",
-						Toast.LENGTH_SHORT).show();
-				Toast.makeText(lastActivity, "추가되었습니다.", Toast.LENGTH_LONG)
+				Toast.makeText(activity, "from Grooveshark", Toast.LENGTH_SHORT)
 						.show();
+				Toast.makeText(activity, "추가되었습니다.", Toast.LENGTH_LONG).show();
 				return;
 			}
 
-			Toast.makeText(lastActivity, "from Youtube", Toast.LENGTH_SHORT)
-					.show();
+			Toast.makeText(activity, "from Youtube", Toast.LENGTH_SHORT).show();
 
 			// if have to use youtube, should get youtube mp4 stream url.
 			YoutubeMp4StreamUrlRequest youtubeMp4StreamUrlRequest = new YoutubeMp4StreamUrlRequest(
 					playInfo.getYoutubeMovieId());
 
-			lastActivity.getContentManager().execute(
-					youtubeMp4StreamUrlRequest, new RequestListener<String>() {
+			activity.getContentManager().execute(youtubeMp4StreamUrlRequest,
+					new RequestListener<String>() {
 						@Override
 						public void onRequestFailure(SpiceException e) {
-							Toast.makeText(lastActivity,
+							Toast.makeText(activity,
 									"이 노래의 무료 스트리밍을 찾지 못했습니다.",
 									Toast.LENGTH_LONG).show();
 						}
@@ -416,34 +344,15 @@ public class MusicPlayer {
 
 							playInfo.setYoutubeMp4StreamUrl(youtubeMp4StreamUrl);
 
-							HowaboutApplication application = (HowaboutApplication) lastActivity
+							HowaboutApplication application = (HowaboutApplication) activity
 									.getApplication();
 
 							application.getMusicPlayer().add(playInfo);
-							Toast.makeText(lastActivity, "추가되었습니다.",
+							Toast.makeText(activity, "추가되었습니다.",
 									Toast.LENGTH_LONG).show();
 						}
 
 					});
-		}
-	}
-
-	public class JavaScriptInterface implements JavascriptCallback {
-		public void onLoadStart(String src) {
-			Log.i("JavaScriptInterface", "onLoadStart(): " + src);
-
-			pause();
-			play(src);
-		}
-
-		public void onPlay() {
-			Log.i("JavaScriptInterface", "onPlay()");
-		}
-
-		public void onEnded() {
-			Log.i("JavaScriptInterface", "onEnded()");
-
-			playNext();
 		}
 	}
 

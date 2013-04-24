@@ -67,7 +67,9 @@ public class RecommendedTrackListActivity extends TrackListActivity {
 
 		if (item.getTitle().equals(listenString)) {
 			application.getMusicPlayer().play(
-					RecommendedTrackListActivity.this, trackTitle, artistName);
+					RecommendedTrackListActivity.this,
+					RecommendedTrackListActivity.this.groovesharkWebView,
+					trackTitle, artistName);
 
 			return true;
 		} else if (item.getTitle().equals(addString)) {

@@ -70,6 +70,8 @@
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/app_id" />
+        
+        <service android:enabled="true" android:name="io.recom.howabout.category.music.service.MusicPlayerService" />
 
     </application>
 

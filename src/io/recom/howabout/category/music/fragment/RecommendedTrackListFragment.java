@@ -1,8 +1,7 @@
 package io.recom.howabout.category.music.fragment;
 
-import io.recom.howabout.RoboSherlockSpiceFragmentActivity;
 import io.recom.howabout.category.music.activity.TrackListActivity;
-import io.recom.howabout.category.music.adapter.TrackListAdapter;
+import io.recom.howabout.category.music.adapter.RandomTrackListAdapter;
 import io.recom.howabout.category.music.model.TrackList;
 import io.recom.howabout.category.music.net.RecommendedTracksRequest;
 import android.os.Bundle;
@@ -52,9 +51,9 @@ public class RecommendedTrackListFragment extends TrackListFragment {
 
 			RecommendedTrackListFragment.this.trackList = trackList;
 
-			trackListAdapter = new TrackListAdapter(
-					(RoboSherlockSpiceFragmentActivity) getActivity(),
-					trackList);
+			TrackListActivity trackListActivity = (TrackListActivity) getActivity();
+			trackListAdapter = new RandomTrackListAdapter(trackListActivity,
+					trackListActivity.getGroovesharkWebView(), trackList);
 			imagesGridView.setAdapter(trackListAdapter);
 			trackListAdapter.notifyDataSetChanged();
 

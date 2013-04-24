@@ -1,7 +1,8 @@
 package io.recom.howabout.category.music.activity;
 
 import io.recom.howabout.R;
-import io.recom.howabout.RoboSherlockSpiceFragmentActivity;
+import io.recom.howabout.RoboSherlockSpiceGroovesharkFragmentActivity;
+import io.recom.howabout.category.music.player.GroovesharkWebView;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectResource;
 import android.content.Intent;
@@ -13,10 +14,10 @@ import com.actionbarsherlock.view.MenuItem;
 
 @ContentView(R.layout.activity_track_list)
 public abstract class TrackListActivity extends
-		RoboSherlockSpiceFragmentActivity {
+		RoboSherlockSpiceGroovesharkFragmentActivity {
 
 	@InjectResource(R.string.title_activity_music_playlist)
-	private String musicPlaylistTitle;
+	protected String musicPlaylistTitle;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +25,9 @@ public abstract class TrackListActivity extends
 
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
+
+		groovesharkWebView = (GroovesharkWebView) findViewById(R.id.groovesharkWebView);
+		groovesharkWebView.init();
 	}
 
 	@Override

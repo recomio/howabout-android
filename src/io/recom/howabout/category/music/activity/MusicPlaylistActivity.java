@@ -2,8 +2,9 @@ package io.recom.howabout.category.music.activity;
 
 import io.recom.howabout.HowaboutApplication;
 import io.recom.howabout.R;
-import io.recom.howabout.RoboSherlockSpiceFragmentActivity;
+import io.recom.howabout.RoboSherlockSpiceGroovesharkFragmentActivity;
 import io.recom.howabout.category.music.adapter.MusicPlaylistAdapter;
+import io.recom.howabout.category.music.player.GroovesharkWebView;
 import io.recom.howabout.category.music.player.MusicPlayer;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
@@ -21,12 +22,16 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
 @ContentView(R.layout.activity_music_playlist)
-public class MusicPlaylistActivity extends RoboSherlockSpiceFragmentActivity {
+public class MusicPlaylistActivity extends
+		RoboSherlockSpiceGroovesharkFragmentActivity {
 
 	MusicPlaylistAdapter musicPlaylistAdapter;
 
 	@InjectView(R.id.listView)
 	protected ListView listView;
+
+	@InjectView(R.id.groovesharkWebView)
+	protected GroovesharkWebView groovesharkWebView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +39,8 @@ public class MusicPlaylistActivity extends RoboSherlockSpiceFragmentActivity {
 
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
+
+		groovesharkWebView.init();
 
 		HowaboutApplication application = (HowaboutApplication) getApplication();
 		final MusicPlayer musicPlayer = application.getMusicPlayer();
@@ -47,7 +54,8 @@ public class MusicPlaylistActivity extends RoboSherlockSpiceFragmentActivity {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 
-				musicPlayer.setLastActivity(MusicPlaylistActivity.this);
+				musicPlayer.setActivity(MusicPlaylistActivity.this);
+				musicPlayer.setGroovesharkWebView(groovesharkWebView);
 				musicPlayer.play(position);
 				musicPlaylistAdapter.notifyDataSetChanged();
 			}
@@ -58,8 +66,11 @@ public class MusicPlaylistActivity extends RoboSherlockSpiceFragmentActivity {
 			public boolean onItemLongClick(AdapterView<?> parent, View view,
 					int position, long id) {
 
-				musicPlayer.setLastActivity(MusicPlaylistActivity.this);
+				musicPlayer.setActivity(MusicPlaylistActivity.this);
+				musicPlayer.setGroovesharkWebView(groovesharkWebView);
 				musicPlayer.remove(position);
+				musicPlayer.play();
+
 				musicPlaylistAdapter.notifyDataSetChanged();
 				return true;
 			}

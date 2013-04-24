@@ -23,7 +23,7 @@ import android.widget.ProgressBar;
 
 import com.octo.android.robospice.request.listener.RequestListener;
 
-@ContentView(R.layout.photo_list)
+@ContentView(R.layout.track_list)
 public abstract class TrackListFragment extends RoboFragment implements
 		OnItemClickListener {
 

@@ -5,6 +5,7 @@ import io.recom.howabout.R;
 import io.recom.howabout.RoboSherlockSpiceFragmentActivity;
 import io.recom.howabout.category.music.model.Track;
 import io.recom.howabout.category.music.model.TrackList;
+import io.recom.howabout.category.music.player.GroovesharkWebView;
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,12 +24,14 @@ import com.nostra13.universalimageloader.core.assist.ImageLoadingListener;
 public class TrackListAdapter extends BaseAdapter {
 
 	protected final RoboSherlockSpiceFragmentActivity activity;
+	protected final GroovesharkWebView groovesharkWebView;
 	protected final TrackList trackList;
 	protected ImageLoader imageLoader;
 
 	public TrackListAdapter(RoboSherlockSpiceFragmentActivity activity,
-			TrackList trackList) {
+			GroovesharkWebView groovesharkWebView, TrackList trackList) {
 		this.activity = activity;
+		this.groovesharkWebView = groovesharkWebView;
 		this.trackList = trackList;
 		this.imageLoader = ImageLoader.getInstance();
 	}
@@ -115,23 +118,9 @@ public class TrackListAdapter extends BaseAdapter {
 		listenTrackButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				// Intent intent = new Intent(TrackListAdapter.this.activity,
-				// MusicPlayerActivity.class);
-				//
-				// Bundle bundle = new Bundle();
-				// bundle.putString("method", "listen");
-				// bundle.putString("trackId", track.getId());
-				// bundle.putString("trackTitle", track.getTrackTitle());
-				// bundle.putString("artistName", track.getArtistName());
-				// intent.putExtras(bundle);
-				//
-				// intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-				//
-				// activity.startActivity(intent);
-
 				HowaboutApplication application = (HowaboutApplication) activity
 						.getApplication();
-				application.getMusicPlayer().play(activity,
+				application.getMusicPlayer().play(activity, groovesharkWebView,
 						track.getTrackTitle(), track.getArtistName());
 			}
 		});
