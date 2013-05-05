@@ -1,6 +1,6 @@
 package io.recom.howabout.category.music.fragment;
 
-import io.recom.howabout.RoboSherlockSpiceGroovesharkFragmentActivity;
+import io.recom.howabout.RoboSherlockFlurryAdlibSpiceFragmentActivity;
 import io.recom.howabout.category.music.adapter.RandomTrackListAdapter;
 import io.recom.howabout.category.music.model.TrackList;
 import io.recom.howabout.category.music.net.RandomTracksRequest;
@@ -46,9 +46,8 @@ public class RandomTrackListFragment extends TrackListFragment {
 
 			RandomTrackListFragment.this.trackList = trackList;
 
-			RoboSherlockSpiceGroovesharkFragmentActivity activity = (RoboSherlockSpiceGroovesharkFragmentActivity) getActivity();
-			trackListAdapter = new RandomTrackListAdapter(activity,
-					activity.getGroovesharkWebView(), trackList);
+			RoboSherlockFlurryAdlibSpiceFragmentActivity activity = (RoboSherlockFlurryAdlibSpiceFragmentActivity) getActivity();
+			trackListAdapter = new RandomTrackListAdapter(activity, trackList);
 
 			imagesGridView.setAdapter(trackListAdapter);
 			trackListAdapter.notifyDataSetChanged();

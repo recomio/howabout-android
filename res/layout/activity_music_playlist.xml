@@ -6,33 +6,127 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <ListView
-        android:id="@+id/listView"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1" >
-    </ListView>
-    
-    <io.recom.howabout.category.music.player.GroovesharkWebView
-        android:id="@+id/groovesharkWebView"
+        android:layout_weight="3" >
+
+        <ImageView
+            android:id="@+id/songImageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:contentDescription="@string/app_name"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_launcher" />
+
+        <ScrollView
+            android:id="@+id/lyricsScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:background="#66000000" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/lyricsTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/lyrics"
+                    android:textColor="#ffffff"
+                    android:textSize="18sp" />
+            </LinearLayout>
+        </ScrollView>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/playlistLayout"
         android:layout_width="match_parent"
-        android:layout_height="0dp" />
-
-    <LinearLayout
-        android:id="@+id/adLayout"
-        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:background="#2a2a2a"
-        android:gravity="center" >
+        android:layout_weight="2"
+        android:orientation="vertical" >
 
-        <com.google.ads.AdView
-            android:id="@+id/adView"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/playerControlBar"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            ads:adSize="SMART_BANNER"
-            ads:adUnitId="@string/admob_publisher_id"
-            ads:loadAdOnCreate="true" />
-    </LinearLayout>
+            android:layout_above="@id/adLayout"
+            android:gravity="center" >
+
+            <ImageButton
+                android:id="@+id/prevButton"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@null"
+                android:contentDescription="@string/app_name"
+                android:scaleType="fitXY"
+                android:src="@android:drawable/ic_media_previous" />
+
+            <ProgressBar
+                android:id="@+id/loadingProgressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+
+            <ImageButton
+                android:id="@+id/playPauseToggleButton"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@null"
+                android:contentDescription="@string/app_name"
+                android:scaleType="fitXY"
+                android:src="@android:drawable/ic_media_play" />
+
+            <ImageButton
+                android:id="@+id/nextButton"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@null"
+                android:contentDescription="@string/app_name"
+                android:scaleType="fitXY"
+                android:src="@android:drawable/ic_media_next" />
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/listView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/playerControlBar"
+            android:layout_alignParentTop="true" >
+        </ListView>
+
+        <LinearLayout
+            android:id="@+id/adLayout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="#2a2a2a"
+            android:gravity="center" >
+
+            <!--
+            <com.google.ads.AdView
+                android:id="@+id/adView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                ads:adSize="SMART_BANNER"
+                ads:adUnitId="@string/admob_publisher_id"
+                ads:loadAdOnCreate="true" >
+            </com.google.ads.AdView>
+            -->
+
+            <com.mocoplex.adlib.AdlibAdViewContainer
+                android:id="@+id/adView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </RelativeLayout>
 
 </LinearLayout>

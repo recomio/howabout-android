@@ -1,14 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <!-- <item
-        android:showAsAction="always|withText"
-        android:title="@string/listen" />
     <item
-        android:showAsAction="always|withText"
-        android:title="@string/add" /> -->
-    <item
-        android:showAsAction="always|withText"
-        android:icon="@android:drawable/ic_media_play"
+        android:showAsAction="ifRoom"
         android:title="@string/title_activity_music_playlist" />
 
 </menu>

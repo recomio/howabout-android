@@ -1,10 +1,9 @@
 package io.recom.howabout.category.music.adapter;
 
 import io.recom.howabout.MainActivity;
-import io.recom.howabout.RoboSherlockSpiceFragmentActivity;
+import io.recom.howabout.RoboSherlockFlurryAdlibSpiceFragmentActivity;
 import io.recom.howabout.category.music.model.TrackList;
 import io.recom.howabout.category.music.net.RandomTracksRequest;
-import io.recom.howabout.category.music.player.GroovesharkWebView;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +17,10 @@ public class RandomTrackListAdapter extends TrackListAdapter {
 	protected RandomTracksRequest tracksRequest = new RandomTracksRequest();
 	protected boolean isLoading = false;
 
-	public RandomTrackListAdapter(RoboSherlockSpiceFragmentActivity activity,
-			GroovesharkWebView groovesharkWebView, TrackList trackList) {
-		super(activity, groovesharkWebView, trackList);
+	public RandomTrackListAdapter(
+			RoboSherlockFlurryAdlibSpiceFragmentActivity activity,
+			TrackList trackList) {
+		super(activity, trackList);
 	}
 
 	@Override

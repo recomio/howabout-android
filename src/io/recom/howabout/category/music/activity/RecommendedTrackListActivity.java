@@ -3,6 +3,7 @@ package io.recom.howabout.category.music.activity;
 import io.recom.howabout.HowaboutApplication;
 import io.recom.howabout.R;
 import io.recom.howabout.category.music.fragment.RecommendedTrackListFragment;
+import io.recom.howabout.category.music.model.Track;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectResource;
 import android.content.res.Configuration;
@@ -26,6 +27,7 @@ public class RecommendedTrackListActivity extends TrackListActivity {
 	protected String trackId;
 	protected String trackTitle;
 	protected String artistName;
+	protected String thumbnailUrl;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +37,7 @@ public class RecommendedTrackListActivity extends TrackListActivity {
 		trackId = bundle.getString("trackId");
 		trackTitle = bundle.getString("trackTitle");
 		artistName = bundle.getString("artistName");
+		thumbnailUrl = bundle.getString("thumbnailUrl");
 
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setTitle(trackTitle);
@@ -63,18 +66,22 @@ public class RecommendedTrackListActivity extends TrackListActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		HowaboutApplication application = (HowaboutApplication) getApplication();
-
 		if (item.getTitle().equals(listenString)) {
-			application.getMusicPlayer().play(
-					RecommendedTrackListActivity.this,
-					RecommendedTrackListActivity.this.groovesharkWebView,
-					trackTitle, artistName);
+			HowaboutApplication application = (HowaboutApplication) getApplication();
+			Track track = new Track();
+			track.setTrackTitle(trackTitle);
+			track.setArtistName(artistName);
+			track.setThumbnailUrl(thumbnailUrl);
+			application.getPlaylistAdapter().play(track);
 
 			return true;
 		} else if (item.getTitle().equals(addString)) {
-			application.getMusicPlayer().add(RecommendedTrackListActivity.this,
-					trackTitle, artistName);
+			HowaboutApplication application = (HowaboutApplication) getApplication();
+			Track track = new Track();
+			track.setTrackTitle(trackTitle);
+			track.setArtistName(artistName);
+			track.setThumbnailUrl(thumbnailUrl);
+			application.getPlaylistAdapter().add(track);
 
 			return true;
 		}

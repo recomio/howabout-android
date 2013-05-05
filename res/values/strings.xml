@@ -19,11 +19,12 @@
     <string name="artistName">가수</string>
     <string name="listen">듣기</string>
     <string name="add">추가</string>
+    <string name="lyrics">가사</string>
     <string name="title_activity_recommended_track_list">추천음악</string>
     <string name="title_activity_searched_track_list">검색</string>
-    <string name="title_activity_music_player">음악플레이어</string>
     <string name="title_activity_music_playlist">플레이리스트</string>
-
+    <string name="exit">종료</string>
+    
     <!-- facebook -->
     <string name="app_id">429667463794371</string>
     <string name="hello_world">Hello world!</string>

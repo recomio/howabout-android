@@ -2,7 +2,6 @@ package io.recom.howabout.category.music.model;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Track {
 
@@ -14,6 +13,7 @@ public class Track {
 	protected int bugsAlbumId;
 	protected String bugsAlbumTitle;
 	protected int refCount;
+	protected String thumbnailUrl;
 
 	public String getId() {
 		return id;
@@ -79,9 +79,17 @@ public class Track {
 		this.refCount = refCount;
 	}
 
-	public String getThumbmailUrl() {
+	public String getThumbnailUrl() {
+		if (thumbnailUrl != null && thumbnailUrl.length() > 0) {
+			return thumbnailUrl;
+		}
+
 		return "http://image.bugsm.co.kr/album/images/224/"
 				+ (bugsAlbumId / 100) + "/" + bugsAlbumId + ".jpg";
 	}
-	
+
+	public void setThumbnailUrl(String thumbnailUrl) {
+		this.thumbnailUrl = thumbnailUrl;
+	}
+
 }

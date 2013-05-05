@@ -19,12 +19,14 @@ public class PlayInfo {
 	protected String groovesharkArtistName;
 	protected String groovesharkAlbumID;
 	protected String groovesharkAlbumName;
+	protected String groovesharkStreamUrl;
 	protected String youtubeMovieId;
 	protected String youtubeMovieUrl;
 	protected String thumbnailImageUrl;
 	protected String hqThumbnailImageUrl;
 	protected String duration;
 	protected String youtubeMp4StreamUrl;
+	protected String lyrics;
 
 	public String getTrackId() {
 		return id;
@@ -142,6 +144,14 @@ public class PlayInfo {
 		this.groovesharkAlbumName = groovesharkAlbumName;
 	}
 
+	public String getGroovesharkStreamUrl() {
+		return groovesharkStreamUrl;
+	}
+
+	public void setGroovesharkStreamUrl(String groovesharkStreamUrl) {
+		this.groovesharkStreamUrl = groovesharkStreamUrl;
+	}
+
 	public String getYoutubeMovieId() {
 		return youtubeMovieId;
 	}
@@ -190,9 +200,17 @@ public class PlayInfo {
 		this.youtubeMp4StreamUrl = youtubeMp4StreamUrl;
 	}
 
-	public String getThumbmailUrl() {
+	public String getThumbnailUrl() {
 		return "http://image.bugsm.co.kr/album/images/224/"
 				+ (bugsAlbumId / 100) + "/" + bugsAlbumId + ".jpg";
+	}
+
+	public void setLyrics(String lyrics) {
+		this.lyrics = lyrics;
+	}
+
+	public String getLyrics() {
+		return lyrics;
 	}
 
 	public boolean isGrooveshark() {

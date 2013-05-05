@@ -3,7 +3,7 @@
     <item android:id="@+id/menu_search"
           android:title="@string/menu_search"
           android:icon="@android:drawable/ic_menu_search"
-          android:showAsAction="ifRoom|collapseActionView"
+          android:showAsAction="always|collapseActionView"
           android:actionViewClass="android.widget.SearchView" />
     
     <!-- <item
@@ -13,9 +13,13 @@
         android:title="@string/title_activity_music_player" /> -->
     
     <item
+        android:id="@+id/menu_exit"
+        android:showAsAction="ifRoom"
+        android:title="@string/exit" />
+    
+    <item
         android:id="@+id/menu_music_playlist"
-        android:showAsAction="always|withText"
-        android:icon="@android:drawable/ic_media_play"
+        android:showAsAction="ifRoom"
         android:title="@string/title_activity_music_playlist" />
 
 </menu>

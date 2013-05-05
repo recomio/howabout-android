@@ -2,10 +2,9 @@ package io.recom.howabout.category.music.adapter;
 
 import io.recom.howabout.HowaboutApplication;
 import io.recom.howabout.R;
-import io.recom.howabout.RoboSherlockSpiceFragmentActivity;
+import io.recom.howabout.RoboSherlockFlurryAdlibSpiceFragmentActivity;
 import io.recom.howabout.category.music.model.Track;
 import io.recom.howabout.category.music.model.TrackList;
-import io.recom.howabout.category.music.player.GroovesharkWebView;
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,15 +22,14 @@ import com.nostra13.universalimageloader.core.assist.ImageLoadingListener;
 
 public class TrackListAdapter extends BaseAdapter {
 
-	protected final RoboSherlockSpiceFragmentActivity activity;
-	protected final GroovesharkWebView groovesharkWebView;
 	protected final TrackList trackList;
 	protected ImageLoader imageLoader;
+	protected RoboSherlockFlurryAdlibSpiceFragmentActivity activity;
 
-	public TrackListAdapter(RoboSherlockSpiceFragmentActivity activity,
-			GroovesharkWebView groovesharkWebView, TrackList trackList) {
+	public TrackListAdapter(
+			RoboSherlockFlurryAdlibSpiceFragmentActivity activity,
+			TrackList trackList) {
 		this.activity = activity;
-		this.groovesharkWebView = groovesharkWebView;
 		this.trackList = trackList;
 		this.imageLoader = ImageLoader.getInstance();
 	}
@@ -80,7 +78,7 @@ public class TrackListAdapter extends BaseAdapter {
 		trackTitle.setText(track.getTrackTitle());
 		artistName.setText(track.getArtistName());
 
-		String imageUrl = track.getThumbmailUrl();
+		String imageUrl = track.getThumbnailUrl();
 
 		imageLoader.displayImage(imageUrl, imageView,
 				new ImageLoadingListener() {
@@ -120,8 +118,7 @@ public class TrackListAdapter extends BaseAdapter {
 			public void onClick(View v) {
 				HowaboutApplication application = (HowaboutApplication) activity
 						.getApplication();
-				application.getMusicPlayer().play(activity, groovesharkWebView,
-						track.getTrackTitle(), track.getArtistName());
+				application.getPlaylistAdapter().play(track);
 			}
 		});
 
@@ -131,8 +128,7 @@ public class TrackListAdapter extends BaseAdapter {
 			public void onClick(View v) {
 				HowaboutApplication application = (HowaboutApplication) activity
 						.getApplication();
-				application.getMusicPlayer().add(activity,
-						track.getTrackTitle(), track.getArtistName());
+				application.getPlaylistAdapter().add(track);
 			}
 		});
 

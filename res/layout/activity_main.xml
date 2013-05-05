@@ -13,11 +13,6 @@
         android:layout_weight="1" >
     </LinearLayout>
 
-    <io.recom.howabout.category.music.player.GroovesharkWebView
-        android:id="@+id/groovesharkWebView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp" />
-
     <LinearLayout
         android:id="@+id/adLayout"
         android:layout_width="fill_parent"
@@ -26,13 +21,19 @@
         android:background="#2a2a2a"
         android:gravity="center" >
 
-        <com.google.ads.AdView
+        <!--
+             <com.google.ads.AdView
             android:id="@+id/adView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             ads:adSize="SMART_BANNER"
             ads:adUnitId="@string/admob_publisher_id"
             ads:loadAdOnCreate="true" />
+        -->
+        <com.mocoplex.adlib.AdlibAdViewContainer
+            android:id="@+id/adView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
 </LinearLayout>

@@ -1,12 +1,11 @@
 package io.recom.howabout;
 
-import com.github.rtyley.android.sherlock.roboguice.activity.RoboSherlockFragmentActivity;
 import com.octo.android.robospice.JacksonSpringAndroidSpiceService;
 import com.octo.android.robospice.SpiceManager;
 
 // RoboSherlockActivity + RoboSpice.
-public abstract class RoboSherlockSpiceFragmentActivity extends
-		RoboSherlockFragmentActivity {
+public abstract class RoboSherlockFlurryAdlibSpiceFragmentActivity extends
+		RoboSherlockFlurryAdlibFragmentActivity {
 
 	protected SpiceManager contentManager = new SpiceManager(
 			JacksonSpringAndroidSpiceService.class);
@@ -15,14 +14,21 @@ public abstract class RoboSherlockSpiceFragmentActivity extends
 	public void onStart() {
 		super.onStart();
 
-		contentManager.start(this);
+		if (!contentManager.isStarted()) {
+			contentManager.start(this);
+		}
 	}
 
 	@Override
 	public void onStop() {
+		super.onStop();
+	}
+
+	@Override
+	public void onDestroy() {
 		contentManager.shouldStop();
 
-		super.onStop();
+		super.onDestroy();
 	}
 
 	public SpiceManager getContentManager() {

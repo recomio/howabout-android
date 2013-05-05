@@ -1,13 +1,9 @@
 package io.recom.howabout;
 
 import io.recom.howabout.category.adult.fragment.AdultCategoryWrapFragment;
-import io.recom.howabout.category.music.activity.MusicPlayerActivity;
 import io.recom.howabout.category.music.activity.MusicPlaylistActivity;
 import io.recom.howabout.category.music.activity.SearchedTrackListActivity;
-import io.recom.howabout.category.music.adapter.MusicPlaylistAdapter;
 import io.recom.howabout.category.music.fragment.MusicCategoryWrapFragment;
-import io.recom.howabout.category.music.player.GroovesharkWebView;
-import io.recom.howabout.category.music.player.MusicPlayer;
 import io.recom.howabout.category.music.service.MusicPlayerService;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -25,15 +21,12 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.SearchView;
 
-//@ContentView(R.layout.activity_main)
-public class MainActivity extends RoboSherlockSpiceGroovesharkFragmentActivity {
+public class MainActivity extends RoboSherlockFlurryAdlibSpiceFragmentActivity {
 
-	// @InjectResource(R.array.category_list)
 	private String[] categoryStrings;
 
-	// @InjectResource(R.string.title_activity_music_player)
-	private String musicPlayerTitle;
 	private String musicPlaylistTitle;
+	private String exit;
 
 	AdultCategoryWrapFragment adultCategoryWrapFragment;
 	MusicCategoryWrapFragment musicCategoryWrapFragment;
@@ -46,14 +39,10 @@ public class MainActivity extends RoboSherlockSpiceGroovesharkFragmentActivity {
 
 		setContentView(R.layout.activity_main);
 
-		groovesharkWebView = (GroovesharkWebView) findViewById(R.id.groovesharkWebView);
-		groovesharkWebView.init();
-
 		categoryStrings = getResources().getStringArray(R.array.category_list);
-		musicPlayerTitle = getResources().getString(
-				R.string.title_activity_music_player);
 		musicPlaylistTitle = getResources().getString(
 				R.string.title_activity_music_playlist);
+		exit = getResources().getString(R.string.exit);
 
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
@@ -77,33 +66,14 @@ public class MainActivity extends RoboSherlockSpiceGroovesharkFragmentActivity {
 		musicCategoryWrapFragmentBundle.putString("category", "music");
 		musicCategoryWrapFragment.setArguments(musicCategoryWrapFragmentBundle);
 
-		// set music player webView.
-		HowaboutApplication application = (HowaboutApplication) getApplication();
-		MusicPlayer musicPlayer = new MusicPlayer(this, groovesharkWebView);
-		application.setMusicPlayer(musicPlayer);
-		musicPlayer.setMusicPlaylistAdapter(new MusicPlaylistAdapter(
-				musicPlayer));
-	}
-
-	@Override
-	public void onStart() {
-		super.onStart();
+		setAdsContainer(R.id.adView);
 	}
 
 	@Override
 	public void onDestroy() {
-		HowaboutApplication application = (HowaboutApplication) getApplication();
-		MusicPlayer musicPlayer = application.getMusicPlayer();
-		musicPlayer.pause();
-
 		stopService(new Intent(this, MusicPlayerService.class));
 
 		super.onDestroy();
-	}
-
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
 	}
 
 	@Override
@@ -118,7 +88,6 @@ public class MainActivity extends RoboSherlockSpiceGroovesharkFragmentActivity {
 		searchView.setIconified(true);
 
 		searchMenu = menu.getItem(0);
-
 		searchMenu.setActionView(searchView).setShowAsAction(
 				MenuItem.SHOW_AS_ACTION_ALWAYS
 						| MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
@@ -165,19 +134,7 @@ public class MainActivity extends RoboSherlockSpiceGroovesharkFragmentActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getTitle().equals(musicPlayerTitle)) {
-			Intent intent = new Intent(this, MusicPlayerActivity.class);
-
-			Bundle bundle = new Bundle();
-			bundle.putString("method", "");
-			intent.putExtras(bundle);
-
-			intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-			startActivity(intent);
-			return true;
-
-		} else if (item.getTitle().equals(musicPlaylistTitle)) {
+		if (item.getTitle().equals(musicPlaylistTitle)) {
 			Intent intent = new Intent(this, MusicPlaylistActivity.class);
 
 			Bundle bundle = new Bundle();
@@ -187,9 +144,19 @@ public class MainActivity extends RoboSherlockSpiceGroovesharkFragmentActivity {
 
 			startActivity(intent);
 			return true;
+		} else if (item.getTitle().equals(exit)) {
+			finish();
 		}
 
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onBackPressed() {
+		Intent setIntent = new Intent(Intent.ACTION_MAIN);
+		setIntent.addCategory(Intent.CATEGORY_HOME);
+		setIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(setIntent);
 	}
 
 	public class HowaboutDropdownNavigationListener implements

@@ -8,8 +8,6 @@ import io.recom.howabout.category.music.model.Track;
 import io.recom.howabout.category.music.model.TrackList;
 import io.recom.howabout.category.music.net.TracksRequest;
 import roboguice.fragment.RoboFragment;
-import roboguice.inject.ContentView;
-import roboguice.inject.InjectView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,16 +21,16 @@ import android.widget.ProgressBar;
 
 import com.octo.android.robospice.request.listener.RequestListener;
 
-@ContentView(R.layout.track_list)
+//@ContentView(R.layout.track_list)
 public abstract class TrackListFragment extends RoboFragment implements
 		OnItemClickListener {
 
 	protected TrackList trackList;
 
-	@InjectView(R.id.photoGrid)
+	// @InjectView(R.id.photoGrid)
 	protected GridView imagesGridView;
 
-	@InjectView(R.id.load)
+	// @InjectView(R.id.load)
 	protected ProgressBar progressBar;
 
 	protected String category;
@@ -59,7 +57,12 @@ public abstract class TrackListFragment extends RoboFragment implements
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.photo_list, container, false);
+		View rootView = inflater.inflate(R.layout.photo_list, container, false);
+
+		imagesGridView = (GridView) rootView.findViewById(R.id.photoGrid);
+		progressBar = (ProgressBar) rootView.findViewById(R.id.load);
+
+		return rootView;
 	}
 
 	@Override
@@ -71,10 +74,7 @@ public abstract class TrackListFragment extends RoboFragment implements
 
 		// this code prevents to re-load trackList from internet.
 		if (trackList != null) {
-			// trackListAdapter = new TrackListAdapter(getActivity(),
-			// trackList);
 			imagesGridView.setAdapter(trackListAdapter);
-			// trackListAdapter.notifyDataSetChanged();
 
 			progressBar.setVisibility(View.GONE);
 		}
@@ -104,6 +104,7 @@ public abstract class TrackListFragment extends RoboFragment implements
 		bundle.putString("trackId", track.getId());
 		bundle.putString("trackTitle", track.getTrackTitle());
 		bundle.putString("artistName", track.getArtistName());
+		bundle.putString("thumbnailUrk", track.getThumbnailUrl());
 		intent.putExtras(bundle);
 
 		startActivity(intent);

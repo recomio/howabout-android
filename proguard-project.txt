@@ -76,3 +76,7 @@
 -keepclassmembers class io.recom.howabout.category.music.player.JavascriptCallback {
    public *;
 }
+
+­keep class com.flurry.** { *; }
+­dontwarn com.flurry.**
+­keepattributes *Annotation*,EnclosingMethod

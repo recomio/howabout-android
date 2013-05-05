@@ -8,13 +8,26 @@
         android:minSdkVersion="8"
         android:targetSdkVersion="17" />
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <!-- 애드립 실행에 필요한 권한 각 플랫폼 별로 요청하는 권한이 모두 다르기 때문에 아래 권한들을 모두 추가하는것을 추천합니다. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.GET_TASKS" /> <!-- 액티비티별 스케줄링을 위해 꼭 추가해주세요. -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- 여기까지 애드립 사용을 위한 필수 권한 -->
+
+
+    <!-- 위치정보를 활용한 보다 최적화된 광고 송출을 위해 필요한 권한입니다. -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- 위치정보를 활용한 보다 최적화된 광고 송출을 위해 필요한 권한입니다. -->
+
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <!-- 애드립 실행에 필요한 권한 -->
 
     <application
         android:name="io.recom.howabout.HowaboutApplication"
@@ -22,6 +35,64 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/HowaboutCustomTheme" >
+
+        <!-- 애드립 사용을 위해 꼭 추가해주세요. -->
+        <activity
+            android:name="com.mocoplex.adlib.AdlibDialogActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@android:style/Theme.Translucent" />
+        <activity
+            android:name="com.mocoplex.adlib.AdlibWebBrowserActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden" />
+        <!-- 애드립 사용을 위해 꼭 추가해주세요. -->
+
+
+        <!-- T-AD - 광고 노출을 위해 필요한 선언입니다. -->
+        <activity
+            android:name="com.skplanet.tad.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+            android:label="Ad Activity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+        </activity>
+        <activity
+            android:name="com.skplanet.tad.AdVideoPlayer"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+            android:label="Ad Video Player"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <!-- TAD - 사용하지 않는다면 여기까지 삭제 -->
+
+
+        <!-- ADMOB - 사용하기 위해 API level 13 이상 최신 SDK 가 필요합니다. -->
+        <activity
+            android:name="com.google.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
+        <!-- ADMOB - 사용하지 않는다면 여기까지 삭제 -->
+
+
+        <!-- INMOBI - 광고 노출을 위해 필요한 선언입니다. -->
+        <!-- Mandatory activity declaration to show the Ad in the embedded browser -->
+        <activity
+            android:name="com.inmobi.androidsdk.IMBrowserActivity"
+            android:configChanges="keyboardHidden|orientation|keyboard|smallestScreenSize|screenSize" />
+
+        <!-- NAVER - 광고 노출을 위해 필요한 선언입니다. -->
+        <activity android:name="com.nbpcorp.mobilead.sdk.MobileAdBrowserActivity" />
+
+        <!-- SHALLWEAD - 광고 노출을 위해 필요한 선언입니다. -->
+        <activity
+            android:name="com.jm.co.shallwead.sdk.ShallWeAdActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden" />
+
+        <receiver
+            android:name="com.jm.co.shallwead.sdk.ShallWeAdReceiver"
+            android:process=":remote" />
+
+        <meta-data
+            android:name="ShallWeAd_AppKey"
+            android:value="" />
+        <!-- 기본 권한 추가 끝 -->
+
         <activity
             android:name="io.recom.howabout.MainActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
@@ -32,9 +103,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.google.ads.AdActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
 
         <service
             android:name="com.octo.android.robospice.JacksonSpringAndroidSpiceService"
@@ -46,22 +114,17 @@
         </activity>
         <activity
             android:name="io.recom.howabout.category.music.activity.RecommendedTrackListActivity"
-            android:label="@string/title_activity_recommended_track_list"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" >
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+            android:label="@string/title_activity_recommended_track_list" >
         </activity>
         <activity
             android:name="io.recom.howabout.category.music.activity.SearchedTrackListActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" >
         </activity>
         <activity
-            android:name="io.recom.howabout.category.music.activity.MusicPlayerActivity"
-            android:label="@string/title_activity_music_player"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" >
-        </activity>
-        <activity
             android:name="io.recom.howabout.category.music.activity.MusicPlaylistActivity"
-            android:label="@string/title_activity_music_playlist"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" >
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+            android:label="@string/title_activity_music_playlist" >
         </activity>
 
         <!-- Activities Required by Facebook -->
@@ -70,9 +133,10 @@
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/app_id" />
-        
-        <service android:enabled="true" android:name="io.recom.howabout.category.music.service.MusicPlayerService" />
 
+        <service
+            android:name="io.recom.howabout.category.music.service.MusicPlayerService"
+            android:enabled="true" />
     </application>
 
 </manifest>
