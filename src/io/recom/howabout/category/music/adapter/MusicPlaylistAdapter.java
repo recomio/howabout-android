@@ -22,7 +22,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.ImageLoadingListener;
 
-public class PlaylistAdapter extends BaseAdapter {
+public class MusicPlaylistAdapter extends BaseAdapter {
 
 	protected HowaboutApplication application;
 
@@ -33,7 +33,7 @@ public class PlaylistAdapter extends BaseAdapter {
 
 	protected String currentLyrics;
 
-	public PlaylistAdapter(HowaboutApplication application) {
+	public MusicPlaylistAdapter(HowaboutApplication application) {
 		super();
 
 		this.application = application;
@@ -92,12 +92,68 @@ public class PlaylistAdapter extends BaseAdapter {
 		play(getCurrentPosition() - 1);
 	}
 
+	public void pause() {
+		Intent intent = new Intent(application, MusicPlayerService.class);
+		Bundle bundle = new Bundle();
+		bundle.putString("type", "pause");
+		intent.putExtras(bundle);
+		application.startService(intent);
+	}
+
+	public void stop() {
+		Intent intent = new Intent(application, MusicPlayerService.class);
+		Bundle bundle = new Bundle();
+		bundle.putString("type", "stop");
+		intent.putExtras(bundle);
+		application.startService(intent);
+	}
+
+	public void playPauseToggle() {
+		Intent intent = new Intent(application, MusicPlayerService.class);
+		Bundle bundle = new Bundle();
+		bundle.putString("type", "playPauseToggle");
+		intent.putExtras(bundle);
+		application.startService(intent);
+	}
+
 	public int getCurrentPosition() {
 		return currentPosition;
 	}
 
 	public void setCurrentPosition(int position) {
 		currentPosition = position;
+
+		notifyDataSetChanged();
+	}
+
+	public void setCurrentLyrics(String lyrics) {
+		currentLyrics = lyrics;
+
+		notifyDataSetChanged();
+	}
+
+	public String getCurrentLyrics() {
+		return currentLyrics;
+	}
+
+	public Track getCurrentItem() {
+		if (currentPosition >= 0 && trackList.size() > currentPosition) {
+			return trackList.get(currentPosition);
+		} else {
+			return null;
+		}
+	}
+
+	public void remove(int position) {
+		if (position == getCurrentPosition()) {
+			stop();
+		}
+
+		if (position <= getCurrentPosition()) {
+			setCurrentPosition(getCurrentPosition() - 1);
+		}
+
+		trackList.remove(position);
 
 		notifyDataSetChanged();
 	}
@@ -175,30 +231,6 @@ public class PlaylistAdapter extends BaseAdapter {
 				});
 
 		return playlistItemView;
-	}
-
-	public void setCurrentLyrics(String lyrics) {
-		currentLyrics = lyrics;
-
-		notifyDataSetChanged();
-	}
-
-	public String getCurrentLyrics() {
-		return currentLyrics;
-	}
-
-	public Track getCurrentItem() {
-		if (currentPosition >= 0) {
-			return trackList.get(currentPosition);
-		} else {
-			return null;
-		}
-	}
-
-	public void remove(int position) {
-		trackList.remove(position);
-
-		notifyDataSetChanged();
 	}
 
 }

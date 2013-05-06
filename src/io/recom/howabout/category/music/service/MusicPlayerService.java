@@ -2,7 +2,7 @@ package io.recom.howabout.category.music.service;
 
 import io.recom.howabout.R;
 import io.recom.howabout.category.music.activity.MusicPlaylistActivity;
-import io.recom.howabout.category.music.adapter.PlaylistAdapter;
+import io.recom.howabout.category.music.adapter.MusicPlaylistAdapter;
 import io.recom.howabout.category.music.model.PlayInfo;
 import io.recom.howabout.category.music.net.PlayInfoRequest;
 import io.recom.howabout.category.music.net.YoutubeMp4StreamUrlRequest;
@@ -10,13 +10,13 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.widget.Toast;
 
 import com.flurry.android.FlurryAgent;
 import com.octo.android.robospice.JacksonSpringAndroidSpiceService;
@@ -34,9 +34,10 @@ public class MusicPlayerService extends Service {
 	protected static SpiceManager contentManager = new SpiceManager(
 			JacksonSpringAndroidSpiceService.class);
 
-	protected static PlaylistAdapter playlistAdapter;
+	protected static MusicPlaylistAdapter playlistAdapter;
 
 	protected static boolean isLoading = false;
+	protected static boolean isLoaded = false;
 
 	public class LocalBinder extends Binder {
 		MusicPlayerService getService() {
@@ -52,11 +53,10 @@ public class MusicPlayerService extends Service {
 
 		FlurryAgent.onStartSession(this, FLURRY_API_KEY);
 
-		mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
 		mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
 			@Override
 			public void onCompletion(MediaPlayer mediaPlayer) {
+				isLoaded = false;
 				playlistAdapter.playNext();
 
 				playlistAdapter.notifyDataSetChanged();
@@ -67,6 +67,8 @@ public class MusicPlayerService extends Service {
 			@Override
 			public void onPrepared(MediaPlayer mediaPlayer) {
 				mediaPlayer.start();
+				isLoading = false;
+				isLoaded = true;
 
 				playlistAdapter.notifyDataSetChanged();
 			}
@@ -86,8 +88,22 @@ public class MusicPlayerService extends Service {
 		} else if (type.equals("pause")) {
 			mediaPlayer.pause();
 		} else if (type.equals("stop")) {
+			isLoaded = false;
 			mediaPlayer.stop();
+			mediaPlayer.reset();
+		} else if (type.equals("playPauseToggle")) {
+			if (mediaPlayer.isPlaying()) {
+				mediaPlayer.pause();
+			} else {
+				try {
+					mediaPlayer.start();
+				} catch (Exception e) {
+					play(trackTitle, artistName, thumbnailUrl);
+				}
+			}
 		}
+
+		playlistAdapter.notifyDataSetChanged();
 
 		return Service.START_NOT_STICKY;
 	}
@@ -108,7 +124,8 @@ public class MusicPlayerService extends Service {
 	}
 
 	@SuppressWarnings("deprecation")
-	private void play(String trackTitle, String artistName, String thumbnailUrl) {
+	private void play(final String trackTitle, final String artistName,
+			String thumbnailUrl) {
 		Notification notification = new Notification(R.drawable.ic_launcher,
 				trackTitle + " - " + artistName, System.currentTimeMillis());
 		Intent intent = new Intent(this, MusicPlaylistActivity.class);
@@ -127,7 +144,11 @@ public class MusicPlayerService extends Service {
 		startForeground(NOTIFICATION_ID, notification);
 
 		playlistAdapter.setCurrentLyrics("");
+		isLoaded = false;
 		isLoading = true;
+
+		mediaPlayer.stop();
+		mediaPlayer.reset();
 
 		PlayInfoRequest playInfoRequest = new PlayInfoRequest(trackTitle,
 				artistName);
@@ -137,6 +158,13 @@ public class MusicPlayerService extends Service {
 					@Override
 					public void onRequestFailure(SpiceException e) {
 						isLoading = false;
+						playlistAdapter.notifyDataSetChanged();
+
+						Toast.makeText(
+								MusicPlayerService.this,
+								trackTitle + "(" + artistName + ")"
+										+ "\n 무료 스트리밍 음원을 찾지 못했습니다.",
+								Toast.LENGTH_SHORT).show();
 					}
 
 					@Override
@@ -152,7 +180,6 @@ public class MusicPlayerService extends Service {
 							} catch (Exception e) {
 
 							} finally {
-								isLoading = false;
 								playlistAdapter.notifyDataSetChanged();
 							}
 						} else {
@@ -164,6 +191,19 @@ public class MusicPlayerService extends Service {
 										@Override
 										public void onRequestFailure(
 												SpiceException e) {
+											isLoading = false;
+											playlistAdapter.playNext();
+											playlistAdapter
+													.notifyDataSetChanged();
+
+											Toast.makeText(
+													MusicPlayerService.this,
+													trackTitle
+															+ "("
+															+ artistName
+															+ ")"
+															+ "\n 무료 스트리밍 음원을 찾지 못했습니다.",
+													Toast.LENGTH_SHORT).show();
 										}
 
 										@Override
@@ -179,7 +219,6 @@ public class MusicPlayerService extends Service {
 											} catch (Exception e) {
 
 											} finally {
-												isLoading = false;
 												playlistAdapter
 														.notifyDataSetChanged();
 											}
@@ -197,7 +236,7 @@ public class MusicPlayerService extends Service {
 		stopForeground(true);
 	}
 
-	public static void setPlaylistAdapter(PlaylistAdapter playlistAdapter) {
+	public static void setPlaylistAdapter(MusicPlaylistAdapter playlistAdapter) {
 		MusicPlayerService.playlistAdapter = playlistAdapter;
 	}
 
@@ -207,6 +246,18 @@ public class MusicPlayerService extends Service {
 
 	public static boolean isLoading() {
 		return isLoading;
+	}
+
+	public static boolean isLoaded() {
+		return isLoaded;
+	}
+
+	public static int getDuration() {
+		return mediaPlayer.getDuration();
+	}
+
+	public static int getCurrentPosition() {
+		return mediaPlayer.getCurrentPosition();
 	}
 
 }

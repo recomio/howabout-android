@@ -1,31 +1,31 @@
 package io.recom.howabout.category.adult.activity;
 
 import io.recom.howabout.R;
+import io.recom.howabout.RoboSherlockFlurryAdlibSpiceFragmentActivity;
 import io.recom.howabout.category.adult.adapter.ShowImageListAdapter;
 import io.recom.howabout.category.adult.model.Image;
 import io.recom.howabout.category.adult.model.ImageList;
 import io.recom.howabout.category.adult.net.ClusteredImagesRequest;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
-
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-import com.github.rtyley.android.sherlock.roboguice.activity.RoboSherlockFragmentActivity;
-import com.octo.android.robospice.JacksonSpringAndroidSpiceService;
-import com.octo.android.robospice.SpiceManager;
-import com.octo.android.robospice.persistence.exception.SpiceException;
-import com.octo.android.robospice.request.listener.RequestListener;
-
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+import com.octo.android.robospice.JacksonSpringAndroidSpiceService;
+import com.octo.android.robospice.SpiceManager;
+import com.octo.android.robospice.persistence.exception.SpiceException;
+import com.octo.android.robospice.request.listener.RequestListener;
+
 @ContentView(R.layout.activity_show_image)
-public class ShowImageActivity extends RoboSherlockFragmentActivity {
+public class ShowImageActivity extends
+		RoboSherlockFlurryAdlibSpiceFragmentActivity {
 
 	@InjectView(R.id.load)
 	private ProgressBar progressBar;
@@ -75,7 +75,7 @@ public class ShowImageActivity extends RoboSherlockFragmentActivity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		MenuInflater inflater = getSupportMenuInflater();
 		inflater.inflate(R.menu.show_image, menu);
-		
+
 		return true;
 	}
 

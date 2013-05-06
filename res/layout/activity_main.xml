@@ -7,12 +7,19 @@
     android:orientation="vertical" >
 
     <LinearLayout
-        android:id="@+id/contentView"
+        android:id="@+id/mainContentView"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1" >
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/musicBottomBar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+    </LinearLayout>
+    
     <LinearLayout
         android:id="@+id/adLayout"
         android:layout_width="fill_parent"
@@ -21,15 +28,6 @@
         android:background="#2a2a2a"
         android:gravity="center" >
 
-        <!--
-             <com.google.ads.AdView
-            android:id="@+id/adView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            ads:adSize="SMART_BANNER"
-            ads:adUnitId="@string/admob_publisher_id"
-            ads:loadAdOnCreate="true" />
-        -->
         <com.mocoplex.adlib.AdlibAdViewContainer
             android:id="@+id/adView"
             android:layout_width="wrap_content"

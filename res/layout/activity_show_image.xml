@@ -15,22 +15,34 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:visibility="visible"
-        />
+            android:visibility="visible" />
     </RelativeLayout>
-    
+
     <ScrollView
-        android:id="@+id/scrollView1"
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
         <LinearLayout
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:orientation="vertical"
-	        android:id="@+id/linearView" >
-	
-	    </LinearLayout>
+            android:id="@+id/linearView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+        </LinearLayout>
     </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/adLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#2a2a2a"
+        android:gravity="center" >
+
+        <com.mocoplex.adlib.AdlibAdViewContainer
+            android:id="@+id/adView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 
 </RelativeLayout>

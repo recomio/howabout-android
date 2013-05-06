@@ -1,6 +1,6 @@
 package io.recom.howabout;
 
-import io.recom.howabout.category.music.adapter.PlaylistAdapter;
+import io.recom.howabout.category.music.adapter.MusicPlaylistAdapter;
 import io.recom.howabout.category.music.service.MusicPlayerService;
 import android.app.Application;
 
@@ -10,7 +10,7 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 public class HowaboutApplication extends Application {
 
-	protected PlaylistAdapter playlistAdapter;
+	protected MusicPlaylistAdapter playlistAdapter;
 
 	@Override
 	public void onCreate() {
@@ -25,11 +25,11 @@ public class HowaboutApplication extends Application {
 		ImageLoader.getInstance().init(config);
 
 		// initialize playlistAdapter to use globally.
-		playlistAdapter = new PlaylistAdapter(this);
+		playlistAdapter = new MusicPlaylistAdapter(this);
 		MusicPlayerService.setPlaylistAdapter(playlistAdapter);
 	}
 
-	public PlaylistAdapter getPlaylistAdapter() {
+	public MusicPlaylistAdapter getPlaylistAdapter() {
 		return playlistAdapter;
 	}
 

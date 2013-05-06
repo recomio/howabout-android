@@ -136,13 +136,11 @@ public class MainActivity extends RoboSherlockFlurryAdlibSpiceFragmentActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getTitle().equals(musicPlaylistTitle)) {
 			Intent intent = new Intent(this, MusicPlaylistActivity.class);
-
 			Bundle bundle = new Bundle();
 			intent.putExtras(bundle);
-
 			intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
 			startActivity(intent);
+
 			return true;
 		} else if (item.getTitle().equals(exit)) {
 			finish();
@@ -177,7 +175,7 @@ public class MainActivity extends RoboSherlockFlurryAdlibSpiceFragmentActivity {
 
 			getSupportFragmentManager()
 					.beginTransaction()
-					.replace(R.id.contentView, categoryWrapFragment,
+					.replace(R.id.mainContentView, categoryWrapFragment,
 							categoryStrings[position]).commit();
 
 			return true;

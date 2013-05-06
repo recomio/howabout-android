@@ -10,27 +10,23 @@ import io.recom.howabout.category.music.net.TracksRequest;
 import roboguice.fragment.RoboFragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.octo.android.robospice.request.listener.RequestListener;
 
-//@ContentView(R.layout.track_list)
 public abstract class TrackListFragment extends RoboFragment implements
 		OnItemClickListener {
 
 	protected TrackList trackList;
-
-	// @InjectView(R.id.photoGrid)
 	protected GridView imagesGridView;
-
-	// @InjectView(R.id.load)
+	protected LinearLayout musicBottomView;
 	protected ProgressBar progressBar;
 
 	protected String category;
@@ -39,11 +35,7 @@ public abstract class TrackListFragment extends RoboFragment implements
 	protected TracksRequest tracksRequest;
 	protected TrackListAdapter trackListAdapter;
 
-	public TrackListFragment() {
-		super();
-
-		Log.d("TrackListFragment", "Constructor()");
-	}
+	protected MusicBottomBarFragment musicBottomBarFragment;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -52,6 +44,8 @@ public abstract class TrackListFragment extends RoboFragment implements
 		Bundle bundle = getArguments();
 		this.category = bundle.getString("category");
 		this.tab = bundle.getString("tab");
+
+		musicBottomBarFragment = new MusicBottomBarFragment();
 	}
 
 	@Override
@@ -72,12 +66,15 @@ public abstract class TrackListFragment extends RoboFragment implements
 		imagesGridView.setOnItemClickListener(this);
 		progressBar.setVisibility(View.VISIBLE);
 
-		// this code prevents to re-load trackList from internet.
 		if (trackList != null) {
 			imagesGridView.setAdapter(trackListAdapter);
 
 			progressBar.setVisibility(View.GONE);
 		}
+
+		getActivity().getSupportFragmentManager().beginTransaction()
+				.replace(R.id.musicBottomBar, musicBottomBarFragment, "music")
+				.commit();
 	}
 
 	@Override

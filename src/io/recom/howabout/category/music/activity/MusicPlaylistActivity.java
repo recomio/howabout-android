@@ -3,9 +3,14 @@ package io.recom.howabout.category.music.activity;
 import io.recom.howabout.HowaboutApplication;
 import io.recom.howabout.R;
 import io.recom.howabout.RoboSherlockFlurryAdlibSpiceFragmentActivity;
-import io.recom.howabout.category.music.adapter.PlaylistAdapter;
+import io.recom.howabout.category.music.adapter.MusicPlaylistAdapter;
 import io.recom.howabout.category.music.model.Track;
 import io.recom.howabout.category.music.service.MusicPlayerService;
+
+import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectResource;
 import roboguice.inject.InjectView;
@@ -40,7 +45,7 @@ public class MusicPlaylistActivity extends
 
 	protected ImageLoader imageLoader;
 
-	protected PlaylistAdapter playlistAdapter;
+	protected MusicPlaylistAdapter playlistAdapter;
 
 	@InjectView(R.id.lyricsScrollView)
 	protected ScrollView lyricsScrollView;
@@ -50,6 +55,15 @@ public class MusicPlaylistActivity extends
 
 	@InjectView(R.id.lyricsTextView)
 	protected TextView lyricsTextView;
+
+	@InjectView(R.id.currentPositionTextView)
+	protected TextView currentPositionTextView;
+
+	@InjectView(R.id.durationTextView)
+	protected TextView durationTextView;
+
+	@InjectView(R.id.currentPositionProgressBar)
+	protected ProgressBar currentPositionProgressBar;
 
 	@InjectView(R.id.listView)
 	protected ListView listView;
@@ -72,6 +86,43 @@ public class MusicPlaylistActivity extends
 	@InjectResource(android.R.drawable.ic_media_pause)
 	protected Drawable pauseIcon;
 
+	protected Timer updateCurrentPositionTimer = new Timer();
+
+	class UpdateCurrentPositionTask extends TimerTask {
+		@Override
+		public void run() {
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					if (!MusicPlayerService.isLoaded()) {
+						durationTextView.setText("--:--");
+						currentPositionTextView.setText("--:--");
+						currentPositionProgressBar.setMax(0);
+						currentPositionProgressBar.setProgress(0);
+
+						return;
+					}
+
+					int duration = MusicPlayerService.getDuration();
+					int currentPosition = MusicPlayerService
+							.getCurrentPosition();
+
+					String durationString = String.format(Locale.KOREA,
+							"%02d:%02d", duration / 1000 / 60,
+							duration / 1000 % 60);
+					String currentPositionString = String.format(Locale.KOREA,
+							"%02d:%02d", currentPosition / 1000 / 60,
+							currentPosition / 1000 % 60);
+					durationTextView.setText(durationString);
+					currentPositionTextView.setText(currentPositionString);
+
+					currentPositionProgressBar.setMax(duration);
+					currentPositionProgressBar.setProgress(currentPosition);
+				}
+			});
+		}
+	};
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -86,10 +137,18 @@ public class MusicPlaylistActivity extends
 		HowaboutApplication application = (HowaboutApplication) getApplication();
 		playlistAdapter = application.getPlaylistAdapter();
 
-		if (MusicPlayerService.isPlaying()) {
-			playPauseToggleButton.setImageDrawable(pauseIcon);
+		if (MusicPlayerService.isLoading()) {
+			loadingProgressBar.setVisibility(View.VISIBLE);
+			playPauseToggleButton.setVisibility(View.GONE);
 		} else {
-			playPauseToggleButton.setImageDrawable(playIcon);
+			if (MusicPlayerService.isPlaying()) {
+				playPauseToggleButton.setImageDrawable(pauseIcon);
+			} else {
+				playPauseToggleButton.setImageDrawable(playIcon);
+			}
+
+			loadingProgressBar.setVisibility(View.GONE);
+			playPauseToggleButton.setVisibility(View.VISIBLE);
 		}
 
 		listView.setAdapter(playlistAdapter);
@@ -102,10 +161,18 @@ public class MusicPlaylistActivity extends
 					actionBar.setTitle(track.getTrackTitle());
 					actionBar.setSubtitle(track.getArtistName());
 
-					if (MusicPlayerService.isPlaying()) {
-						playPauseToggleButton.setImageDrawable(pauseIcon);
+					if (MusicPlayerService.isLoading()) {
+						loadingProgressBar.setVisibility(View.VISIBLE);
+						playPauseToggleButton.setVisibility(View.GONE);
 					} else {
-						playPauseToggleButton.setImageDrawable(playIcon);
+						if (MusicPlayerService.isPlaying()) {
+							playPauseToggleButton.setImageDrawable(pauseIcon);
+						} else {
+							playPauseToggleButton.setImageDrawable(playIcon);
+						}
+
+						loadingProgressBar.setVisibility(View.GONE);
+						playPauseToggleButton.setVisibility(View.VISIBLE);
 					}
 
 					imageLoader.displayImage(track.getThumbnailUrl(),
@@ -175,7 +242,7 @@ public class MusicPlaylistActivity extends
 		playPauseToggleButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				// musicPlayer.playPauseToggle();
+				playlistAdapter.playPauseToggle();
 
 				if (MusicPlayerService.isPlaying()) {
 					playPauseToggleButton.setImageDrawable(pauseIcon);
@@ -199,6 +266,9 @@ public class MusicPlaylistActivity extends
 			}
 		});
 
+		UpdateCurrentPositionTask updateCurrentPositionTask = new UpdateCurrentPositionTask();
+		updateCurrentPositionTimer.scheduleAtFixedRate(
+				updateCurrentPositionTask, 0, 1000);
 	}
 
 	@Override

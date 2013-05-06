@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/RootView"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:layout_alignParentLeft="true"
     android:layout_alignParentTop="true"
-    android:layout_marginLeft="14dp" >
+    android:background="#292929" >
 
     <ImageView
         android:id="@+id/image"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_alignParentLeft="true"
-        android:layout_margin="1dp"
         android:contentDescription="@string/app_name"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_launcher"
@@ -21,6 +21,7 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
         android:layout_toRightOf="@id/image"
         android:orientation="vertical"
         android:layout_centerInParent="true" >
@@ -31,7 +32,7 @@
             android:layout_height="wrap_content"
             android:singleLine="true"
             android:text="@string/trackTitle"
-            android:textColor="#444444"
+            android:textColor="#ffffff"
             android:textStyle="bold" />
 
         <TextView
@@ -41,7 +42,7 @@
             android:singleLine="true"
             android:text="@string/artistName"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="#777777" />
+            android:textColor="#dddddd" />
     </LinearLayout>
 
     <RelativeLayout
@@ -51,12 +52,21 @@
         android:layout_centerInParent="true" >
 
         <ImageView
-            android:id="@+id/isCurrentItem"
+            android:id="@+id/isPlaying"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:contentDescription="@string/app_name"
-            android:src="@drawable/ic_checkmark_holo_light" />
+            android:src="@android:drawable/ic_media_pause"
+            android:visibility="gone" />
+
+        <ProgressBar
+            android:id="@+id/isLoading"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/isPlaying" />
         
     </RelativeLayout>
 
