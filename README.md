@@ -17,6 +17,13 @@ Please see the [issues](https://github.com/recomio/howabout-android/issues) sect
 * [Apache Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 
+## Building
+
+To build this project you should import & add [ActionBarSherlock](https://github.com/JakeWharton/ActionBarSherlock) and [ViewPagerIndicator](https://github.com/JakeWharton/Android-ViewPagerIndicator) libraries as ApkLibs.
+
+Don't forget to sync *libs/android-support-v4.jar* files in your all projects.
+
+
 ## Acknowledgements
 
 This project uses the [Recomio API](http://recom.io) and [ListenA](http://listena.recom.io) to get K-pop music recommendations.
@@ -64,6 +71,8 @@ but will be thoroughly reviewed and discussed.
 * adlibr (광고)
 
 범용적이고 널리 사용되는 라이브러리를 골라 사용하였으며 UI와 액티비티 구성에서 최대한 안드로이드가 제시하는 가이드라인을 최대한 따르도록 했습니다. 서버와의 RESTful+JSON 통신, 음악 스트리밍을 위한 MediaPlayer, ForegroundService 연계도 보실 수 있습니다.
+
+이 프로젝트를 빌드하시려면 [ActionBarSherlock](https://github.com/JakeWharton/ActionBarSherlock), [ViewPagerIndicator](https://github.com/JakeWharton/Android-ViewPagerIndicator) 라이브러리를 ApkLib으로 등록하셔야 합니다. 그리고 사용되는 프로젝트의 모든 *libs/android-support-v4.jar* 파일은 동일한 버전이어야 합니다.
 
 소스코드에 대한 문의사항나 기능 추가 등은 GitHub 이슈 페이지에 남겨주시면 따르도록 하겠습니다.
 
