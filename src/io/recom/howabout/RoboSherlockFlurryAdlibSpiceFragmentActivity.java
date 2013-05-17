@@ -1,5 +1,7 @@
 package io.recom.howabout;
 
+import android.os.Bundle;
+
 import com.octo.android.robospice.JacksonSpringAndroidSpiceService;
 import com.octo.android.robospice.SpiceManager;
 
@@ -11,12 +13,17 @@ public abstract class RoboSherlockFlurryAdlibSpiceFragmentActivity extends
 			JacksonSpringAndroidSpiceService.class);
 
 	@Override
-	public void onStart() {
-		super.onStart();
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 
 		if (!contentManager.isStarted()) {
 			contentManager.start(this);
 		}
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
 	}
 
 	@Override

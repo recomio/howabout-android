@@ -162,12 +162,16 @@ public class MainActivity extends RoboSherlockFlurryAdlibSpiceFragmentActivity {
 
 		@Override
 		public boolean onNavigationItemSelected(int position, long itemId) {
-			searchMenu.setVisible(false);
+			if (searchMenu != null) {
+				searchMenu.setVisible(false);
+			}
 
 			Fragment categoryWrapFragment;
 
 			if (position == 0) {
-				searchMenu.setVisible(true);
+				if (searchMenu != null) {
+					searchMenu.setVisible(true);
+				}
 				categoryWrapFragment = MainActivity.this.musicCategoryWrapFragment;
 			} else {
 				categoryWrapFragment = MainActivity.this.adultCategoryWrapFragment;
