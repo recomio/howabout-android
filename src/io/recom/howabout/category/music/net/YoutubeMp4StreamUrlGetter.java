@@ -127,9 +127,13 @@ public class YoutubeMp4StreamUrlGetter {
 
 		String itag = null;
 		String url = null;
+		boolean isEnded = false;
 
 		for (int i = 0; i < urls.length; i++) {
 			String element = urls[i];
+			if (element.endsWith("}]")) {
+				isEnded = true;
+			}
 
 			if (element.startsWith("stream_map\": [{")) {
 				element = element.replace("stream_map\": [{", "");
@@ -147,6 +151,8 @@ public class YoutubeMp4StreamUrlGetter {
 				value = value.replace("u0026", "&");
 				if (value.endsWith("}")) {
 					value = value.substring(0, value.length() - 1);
+				} else if (value.endsWith("}]")) {
+					value = value.substring(0, value.length() - 2);
 				}
 				url = value;
 			}
@@ -155,6 +161,10 @@ public class YoutubeMp4StreamUrlGetter {
 				foundArray.put(itag, URLDecoder.decode(url, "UTF-8"));
 				itag = null;
 				url = null;
+			}
+
+			if (isEnded) {
+				break;
 			}
 		}
 
