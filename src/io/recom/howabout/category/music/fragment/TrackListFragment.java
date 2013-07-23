@@ -101,7 +101,7 @@ public abstract class TrackListFragment extends RoboFragment implements
 		bundle.putString("trackId", track.getId());
 		bundle.putString("trackTitle", track.getTrackTitle());
 		bundle.putString("artistName", track.getArtistName());
-		bundle.putString("thumbnailUrk", track.getThumbnailUrl());
+		bundle.putString("thumbnailUrl", track.getThumbnailUrl());
 		intent.putExtras(bundle);
 
 		startActivity(intent);
