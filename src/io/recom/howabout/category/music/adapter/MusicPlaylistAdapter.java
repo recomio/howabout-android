@@ -3,12 +3,11 @@ package io.recom.howabout.category.music.adapter;
 import io.recom.howabout.HowaboutApplication;
 import io.recom.howabout.R;
 import io.recom.howabout.category.music.model.Track;
+import io.recom.howabout.category.music.model.TrackList;
 import io.recom.howabout.category.music.service.MusicPlayerService;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -18,6 +17,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.ImageLoadingListener;
@@ -28,7 +28,7 @@ public class MusicPlaylistAdapter extends BaseAdapter {
 
 	protected ImageLoader imageLoader = ImageLoader.getInstance();;
 
-	protected List<Track> trackList = new ArrayList<Track>();
+	protected TrackList trackList = new TrackList();
 	protected int currentPosition = -1;
 
 	protected String currentLyrics;
@@ -39,12 +39,61 @@ public class MusicPlaylistAdapter extends BaseAdapter {
 		this.application = application;
 	}
 
+	public MusicPlaylistAdapter(HowaboutApplication application,
+			TrackList trackList) {
+		this(application);
+
+		setTrackList(trackList);
+	}
+
+	public void setTrackList(TrackList trackList) {
+		this.trackList = trackList;
+
+		if (trackList.size() > 0) {
+			setCurrentPosition(0);
+		}
+
+		saveTrackListToPrefs();
+	}
+
 	public void add(Track track) {
 		trackList.add(track);
+
+		saveTrackListToPrefs();
 	}
 
 	public void add(int position, Track track) {
 		trackList.add(position, track);
+
+		saveTrackListToPrefs();
+	}
+
+	public void remove(int position) {
+		if (position == getCurrentPosition()) {
+			stop();
+		}
+
+		if (position <= getCurrentPosition()) {
+			setCurrentPosition(getCurrentPosition() - 1);
+		}
+
+		trackList.remove(position);
+
+		notifyDataSetChanged();
+
+		saveTrackListToPrefs();
+	}
+
+	protected void saveTrackListToPrefs() {
+		Gson gson = new Gson();
+		String trackListJson = gson.toJson(trackList);
+
+		String prefsName = application.getString(R.string.prefs_name);
+		SharedPreferences prefs = application
+				.getSharedPreferences(prefsName, 0);
+		Editor editor = prefs.edit();
+		editor.putString("trackListJson", trackListJson);
+		editor.commit();
 	}
 
 	public void play(Track track) {
@@ -109,11 +158,15 @@ public class MusicPlaylistAdapter extends BaseAdapter {
 	}
 
 	public void playPauseToggle() {
-		Intent intent = new Intent(application, MusicPlayerService.class);
-		Bundle bundle = new Bundle();
-		bundle.putString("type", "playPauseToggle");
-		intent.putExtras(bundle);
-		application.startService(intent);
+		if (currentLyrics == null) {
+			play();
+		} else {
+			Intent intent = new Intent(application, MusicPlayerService.class);
+			Bundle bundle = new Bundle();
+			bundle.putString("type", "playPauseToggle");
+			intent.putExtras(bundle);
+			application.startService(intent);
+		}
 	}
 
 	public int getCurrentPosition() {
@@ -142,20 +195,6 @@ public class MusicPlaylistAdapter extends BaseAdapter {
 		} else {
 			return null;
 		}
-	}
-
-	public void remove(int position) {
-		if (position == getCurrentPosition()) {
-			stop();
-		}
-
-		if (position <= getCurrentPosition()) {
-			setCurrentPosition(getCurrentPosition() - 1);
-		}
-
-		trackList.remove(position);
-
-		notifyDataSetChanged();
 	}
 
 	@Override

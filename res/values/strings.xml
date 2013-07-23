@@ -24,6 +24,7 @@
     <string name="title_activity_searched_track_list">검색</string>
     <string name="title_activity_music_playlist">플레이리스트</string>
     <string name="exit">종료</string>
+    <string name="prefs_name">HowaboutPrefsFile</string>
     
     <!-- facebook -->
     <string name="app_id">429667463794371</string>
