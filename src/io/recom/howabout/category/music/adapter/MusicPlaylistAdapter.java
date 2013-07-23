@@ -84,6 +84,17 @@ public class MusicPlaylistAdapter extends BaseAdapter {
 		saveTrackListToPrefs();
 	}
 
+	public void clear() {
+		stop();
+		setCurrentPosition(-1);
+
+		trackList.clear();
+
+		notifyDataSetChanged();
+
+		saveTrackListToPrefs();
+	}
+
 	protected void saveTrackListToPrefs() {
 		Gson gson = new Gson();
 		String trackListJson = gson.toJson(trackList);

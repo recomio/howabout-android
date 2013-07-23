@@ -305,6 +305,13 @@ public class MusicPlaylistActivity extends
 			finish();
 			return true;
 		}
+
+		if (item.getItemId() == R.id.menu_clear) {
+			HowaboutApplication application = (HowaboutApplication) getApplication();
+			application.getPlaylistAdapter().clear();
+			return true;
+		}
+
 		return super.onOptionsItemSelected(item);
 	}
 
