@@ -169,7 +169,8 @@ public class MusicPlaylistAdapter extends BaseAdapter {
 	}
 
 	public void playPauseToggle() {
-		if (currentLyrics == null) {
+		if (currentLyrics == null && trackList.size() > 0
+				&& getCurrentPosition() >= 0) {
 			play();
 		} else {
 			Intent intent = new Intent(application, MusicPlayerService.class);
