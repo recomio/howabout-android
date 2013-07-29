@@ -1,9 +1,12 @@
 package io.recom.howabout.category.music.service;
 
+import io.recom.howabout.HowaboutApplication;
 import io.recom.howabout.R;
 import io.recom.howabout.category.music.activity.MusicPlaylistActivity;
 import io.recom.howabout.category.music.adapter.MusicPlaylistAdapter;
 import io.recom.howabout.category.music.model.PlayInfo;
+import io.recom.howabout.category.music.net.GroovesharkStreamUrlGetter;
+import io.recom.howabout.category.music.net.GroovesharkStreamUrlGetter.OnGetGroovesharkStreamKey;
 import io.recom.howabout.category.music.net.PlayInfoRequest;
 import io.recom.howabout.category.music.net.YoutubeMp4StreamUrlRequest;
 import android.app.Notification;
@@ -16,6 +19,7 @@ import android.media.MediaPlayer.OnPreparedListener;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.flurry.android.FlurryAgent;
@@ -158,6 +162,7 @@ public class MusicPlayerService extends Service {
 					@Override
 					public void onRequestFailure(SpiceException e) {
 						isLoading = false;
+						playlistAdapter.playNext();
 						playlistAdapter.notifyDataSetChanged();
 
 						Toast.makeText(
@@ -171,60 +176,36 @@ public class MusicPlayerService extends Service {
 					public void onRequestSuccess(final PlayInfo playInfo) {
 						playlistAdapter.setCurrentLyrics(playInfo.getLyrics());
 
-						if (playInfo.isGrooveshark()) {
+						Log.i("grooveshark", playInfo.getTrackTitle());
+						final String groovesharkSongId = playInfo
+								.getTinysongId();
+						if (groovesharkSongId != null) {
+							HowaboutApplication application = (HowaboutApplication) getApplicationContext();
+							GroovesharkStreamUrlGetter groovesharkStreamUrlGetter;
 							try {
-								mediaPlayer.reset();
-								mediaPlayer.setDataSource(playInfo
-										.getGroovesharkStreamUrl());
-								mediaPlayer.prepareAsync();
-							} catch (Exception e) {
+								groovesharkStreamUrlGetter = new GroovesharkStreamUrlGetter(
+										application, groovesharkSongId,
+										new OnGetGroovesharkStreamKey() {
+											@Override
+											public void sucess(String streamUrl) {
+												playInfo.setGroovesharkSongID(groovesharkSongId);
+												playInfo.setGroovesharkStreamUrl(streamUrl);
+												playStream(playInfo);
+											}
 
-							} finally {
-								playlistAdapter.notifyDataSetChanged();
+											@Override
+											public void error(Exception e) {
+												playStream(playInfo);
+											}
+										});
+
+								groovesharkStreamUrlGetter
+										.getGroovesharkStreamUrlAsync();
+							} catch (Exception e) {
+								playStream(playInfo);
 							}
 						} else {
-							YoutubeMp4StreamUrlRequest youtubeMp4StreamUrlRequest = new YoutubeMp4StreamUrlRequest(
-									playInfo.getYoutubeMovieId());
-
-							contentManager.execute(youtubeMp4StreamUrlRequest,
-									new RequestListener<String>() {
-										@Override
-										public void onRequestFailure(
-												SpiceException e) {
-											isLoading = false;
-											playlistAdapter.playNext();
-											playlistAdapter
-													.notifyDataSetChanged();
-
-											Toast.makeText(
-													MusicPlayerService.this,
-													trackTitle
-															+ "("
-															+ artistName
-															+ ")"
-															+ "\n 무료 스트리밍 음원을 찾지 못했습니다.",
-													Toast.LENGTH_SHORT).show();
-										}
-
-										@Override
-										public void onRequestSuccess(
-												String youtubeMp4StreamUrl) {
-											playInfo.setYoutubeMp4StreamUrl(youtubeMp4StreamUrl);
-
-											try {
-												mediaPlayer.reset();
-												mediaPlayer
-														.setDataSource(youtubeMp4StreamUrl);
-												mediaPlayer.prepareAsync();
-											} catch (Exception e) {
-
-											} finally {
-												playlistAdapter
-														.notifyDataSetChanged();
-											}
-										}
-
-									});
+							playStream(playInfo);
 						}
 					}
 
@@ -234,6 +215,58 @@ public class MusicPlayerService extends Service {
 	private void stop() {
 		mediaPlayer.stop();
 		stopForeground(true);
+	}
+
+	protected void playStream(final PlayInfo playInfo) {
+		final String trackTitle = playInfo.getTrackTitle();
+		final String artistName = playInfo.getArtistName();
+
+		if (playInfo.isGrooveshark()) {
+			try {
+				mediaPlayer.reset();
+				mediaPlayer.setDataSource(playInfo.getGroovesharkStreamUrl());
+				mediaPlayer.prepareAsync();
+			} catch (Exception e) {
+
+			} finally {
+				playlistAdapter.notifyDataSetChanged();
+			}
+		} else {
+			YoutubeMp4StreamUrlRequest youtubeMp4StreamUrlRequest = new YoutubeMp4StreamUrlRequest(
+					playInfo.getYoutubeMovieId());
+
+			contentManager.execute(youtubeMp4StreamUrlRequest,
+					new RequestListener<String>() {
+						@Override
+						public void onRequestFailure(SpiceException e) {
+							isLoading = false;
+							playlistAdapter.playNext();
+							playlistAdapter.notifyDataSetChanged();
+
+							Toast.makeText(
+									MusicPlayerService.this,
+									trackTitle + "(" + artistName + ")"
+											+ "\n 무료 스트리밍 음원을 찾지 못했습니다.",
+									Toast.LENGTH_SHORT).show();
+						}
+
+						@Override
+						public void onRequestSuccess(String youtubeMp4StreamUrl) {
+							playInfo.setYoutubeMp4StreamUrl(youtubeMp4StreamUrl);
+
+							try {
+								mediaPlayer.reset();
+								mediaPlayer.setDataSource(youtubeMp4StreamUrl);
+								mediaPlayer.prepareAsync();
+							} catch (Exception e) {
+
+							} finally {
+								playlistAdapter.notifyDataSetChanged();
+							}
+						}
+
+					});
+		}
 	}
 
 	public static void setPlaylistAdapter(MusicPlaylistAdapter playlistAdapter) {

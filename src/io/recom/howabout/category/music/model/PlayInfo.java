@@ -13,6 +13,7 @@ public class PlayInfo {
 	protected int bugsAlbumId;
 	protected String bugsAlbumTitle;
 	protected int refCount;
+	protected String tinysongId;
 	protected String groovesharkSongID;
 	protected String groovesharkSongName;
 	protected String groovesharkArtistID;
@@ -94,6 +95,14 @@ public class PlayInfo {
 
 	public String getId() {
 		return id;
+	}
+
+	public String getTinysongId() {
+		return tinysongId;
+	}
+
+	public void setTinysongId(String tinySongId) {
+		this.tinysongId = tinySongId;
 	}
 
 	public String getGroovesharkSongID() {
