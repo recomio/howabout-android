@@ -170,17 +170,17 @@ public class MusicPlaylistAdapter extends BaseAdapter {
 
 	public void playPauseToggle() {
 		try {
-			Intent intent = new Intent(application, MusicPlayerService.class);
-			Bundle bundle = new Bundle();
-			bundle.putString("type", "playPauseToggle");
+		Intent intent = new Intent(application, MusicPlayerService.class);
+		Bundle bundle = new Bundle();
+		bundle.putString("type", "playPauseToggle");
 
-			Track track = trackList.get(getCurrentPosition());
-			bundle.putString("trackTitle", track.getTrackTitle());
-			bundle.putString("artistName", track.getArtistName());
-			bundle.putString("thumbnailUrl", track.getThumbnailUrl());
+		Track track = trackList.get(getCurrentPosition());
+		bundle.putString("trackTitle", track.getTrackTitle());
+		bundle.putString("artistName", track.getArtistName());
+		bundle.putString("thumbnailUrl", track.getThumbnailUrl());
 
-			intent.putExtras(bundle);
-			application.startService(intent);
+		intent.putExtras(bundle);
+		application.startService(intent);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

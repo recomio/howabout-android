@@ -25,6 +25,7 @@ import android.widget.Toast;
 import com.flurry.android.FlurryAgent;
 import com.octo.android.robospice.JacksonSpringAndroidSpiceService;
 import com.octo.android.robospice.SpiceManager;
+import com.octo.android.robospice.exception.RequestCancelledException;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 
@@ -43,6 +44,9 @@ public class MusicPlayerService extends Service {
 	protected static boolean isLoading = false;
 	protected static boolean isLoaded = false;
 
+	protected PlayInfoRequest playInfoRequest = null;
+	protected GroovesharkStreamUrlGetter groovesharkStreamUrlGetter = null;
+
 	public class LocalBinder extends Binder {
 		MusicPlayerService getService() {
 			return MusicPlayerService.this;
@@ -60,6 +64,10 @@ public class MusicPlayerService extends Service {
 		mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
 			@Override
 			public void onCompletion(MediaPlayer mediaPlayer) {
+				if (groovesharkStreamUrlGetter != null) {
+					groovesharkStreamUrlGetter.isStopped(true);
+				}
+
 				isLoaded = false;
 				playlistAdapter.playNext();
 
@@ -86,6 +94,10 @@ public class MusicPlayerService extends Service {
 		String trackTitle = bundle.getString("trackTitle");
 		String artistName = bundle.getString("artistName");
 		String thumbnailUrl = bundle.getString("thumbnailUrl");
+
+		if (groovesharkStreamUrlGetter != null) {
+			groovesharkStreamUrlGetter.isStopped(true);
+		}
 
 		if (type.equals("play")) {
 			play(trackTitle, artistName, thumbnailUrl);
@@ -158,13 +170,25 @@ public class MusicPlayerService extends Service {
 		mediaPlayer.stop();
 		mediaPlayer.reset();
 
-		PlayInfoRequest playInfoRequest = new PlayInfoRequest(trackTitle,
-				artistName);
+		if (playInfoRequest != null) {
+			contentManager.cancel(playInfoRequest);
+			playInfoRequest = null;
+		}
+
+		playInfoRequest = new PlayInfoRequest(trackTitle, artistName);
 
 		contentManager.execute(playInfoRequest,
 				new RequestListener<PlayInfo>() {
 					@Override
 					public void onRequestFailure(SpiceException e) {
+						if (groovesharkStreamUrlGetter != null) {
+							groovesharkStreamUrlGetter.isStopped(true);
+						}
+
+						if (e instanceof RequestCancelledException) {
+							return;
+						}
+
 						isLoading = false;
 						playlistAdapter.playNext();
 						playlistAdapter.notifyDataSetChanged();
@@ -185,7 +209,6 @@ public class MusicPlayerService extends Service {
 								.getTinysongId();
 						if (groovesharkSongId != null) {
 							HowaboutApplication application = (HowaboutApplication) getApplicationContext();
-							GroovesharkStreamUrlGetter groovesharkStreamUrlGetter;
 							try {
 								groovesharkStreamUrlGetter = new GroovesharkStreamUrlGetter(
 										application, groovesharkSongId,
@@ -243,6 +266,10 @@ public class MusicPlayerService extends Service {
 					new RequestListener<String>() {
 						@Override
 						public void onRequestFailure(SpiceException e) {
+							if (groovesharkStreamUrlGetter != null) {
+								groovesharkStreamUrlGetter.isStopped(true);
+							}
+
 							isLoading = false;
 							playlistAdapter.playNext();
 							playlistAdapter.notifyDataSetChanged();

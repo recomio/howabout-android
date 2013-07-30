@@ -44,6 +44,8 @@ public class GroovesharkStreamUrlGetter {
 
 	OnGetGroovesharkStreamKey onGetGroovesharkStreamKey;
 
+	boolean isStopped = false;
+
 	public GroovesharkStreamUrlGetter(Context context, String songId,
 			OnGetGroovesharkStreamKey onGroovesharkStreamKey)
 			throws NoSuchAlgorithmException {
@@ -113,6 +115,10 @@ public class GroovesharkStreamUrlGetter {
 
 	public void groovesharkMainPageCallback(String url, String body,
 			AjaxStatus status) {
+		if (isStopped) {
+			return;
+		}
+
 		if (status.getCode() != 200) {
 			onGetGroovesharkStreamKey.error(new Exception(
 					"Failed to get grooveshark stream url."));
@@ -197,6 +203,10 @@ public class GroovesharkStreamUrlGetter {
 
 	public void groovesharkGetCommunicationTokenCallback(String url,
 			JSONObject jsonResponseObject, AjaxStatus status) {
+		if (isStopped) {
+			return;
+		}
+
 		if (status.getCode() != 200) {
 			onGetGroovesharkStreamKey.error(new Exception(
 					"Failed to get grooveshark stream url."));
@@ -275,6 +285,10 @@ public class GroovesharkStreamUrlGetter {
 
 	public void groovesharkGetStreamKeyCallback(String url,
 			JSONObject jsonResponseObject, AjaxStatus status) {
+		if (isStopped) {
+			return;
+		}
+
 		if (status.getCode() != 200) {
 			onGetGroovesharkStreamKey.error(new Exception(
 					"Failed to get grooveshark stream url."));
@@ -299,4 +313,13 @@ public class GroovesharkStreamUrlGetter {
 
 		onGetGroovesharkStreamKey.sucess(streamUrl);
 	}
+
+	public void isStopped(boolean isStopped) {
+		this.isStopped = isStopped;
+	}
+
+	public boolean isStopped() {
+		return isStopped;
+	}
+
 }
