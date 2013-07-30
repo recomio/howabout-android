@@ -99,10 +99,14 @@ public class MusicPlayerService extends Service {
 			if (mediaPlayer.isPlaying()) {
 				mediaPlayer.pause();
 			} else {
-				try {
-					mediaPlayer.start();
-				} catch (Exception e) {
+				if (!(isLoading() || isLoaded())) {
 					play(trackTitle, artistName, thumbnailUrl);
+				} else {
+					try {
+						mediaPlayer.start();
+					} catch (Exception e) {
+						play(trackTitle, artistName, thumbnailUrl);
+					}
 				}
 			}
 		}

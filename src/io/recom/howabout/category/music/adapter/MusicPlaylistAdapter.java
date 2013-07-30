@@ -169,15 +169,20 @@ public class MusicPlaylistAdapter extends BaseAdapter {
 	}
 
 	public void playPauseToggle() {
-		if (currentLyrics == null && trackList.size() > 0
-				&& getCurrentPosition() >= 0) {
-			play();
-		} else {
+		try {
 			Intent intent = new Intent(application, MusicPlayerService.class);
 			Bundle bundle = new Bundle();
 			bundle.putString("type", "playPauseToggle");
+
+			Track track = trackList.get(getCurrentPosition());
+			bundle.putString("trackTitle", track.getTrackTitle());
+			bundle.putString("artistName", track.getArtistName());
+			bundle.putString("thumbnailUrl", track.getThumbnailUrl());
+
 			intent.putExtras(bundle);
 			application.startService(intent);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
